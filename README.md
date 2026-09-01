@@ -1,5 +1,5 @@
 > [!NOTE]
-> Relatos de bugs e pull requests são bem-vindos, mas entenda que o desenvolvimento acontece no meu tempo livre e o progresso pode ser lento às vezes. O projeto continua mantido mesmo que o último commit tenha sido há um tempo.
+> Este fork é mantido apenas para a tradução pt-BR. O projeto original é [pythonlover02/volt-gui](https://github.com/pythonlover02/volt-gui) — reportes de bugs e melhorias da camada devem ser feitos lá. Este fork é responsável somente pela tradução para o Português-BR.
 
 # volt-gui
 
