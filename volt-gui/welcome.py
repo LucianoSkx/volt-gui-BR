@@ -14,98 +14,98 @@ from ui import create_tab_content_widget
 
 def get_welcome_settings() -> dict:
     return {
-        "Welcome": {
-            "Welcome to volt gui": (
-                ("text", "volt-gui is my AMD Adrenaline / NVIDIA Settings Linux Alternative.\n\nSettings are applied by volt, a Vulkan implicit layer, so they work on every Vulkan driver: RADV, ANV, NVK, AMDVLK, the NVIDIA proprietary driver, and anything else that supports Vulkan 1.0."),
-                ("text", "The layer sticks to core Vulkan 1.0 and the swapchain extension, so nothing here behaves differently from one driver to the next."),
+        "Bem-vindo": {
+            "Bem-vindo ao volt-gui": (
+                ("text", "O volt-gui é minha Alternativa ao AMD Adrenaline / NVIDIA Settings para Linux.\n\nAs configurações são aplicadas pelo volt, uma camada implícita Vulkan, então funcionam em todo driver Vulkan: RADV, ANV, NVK, AMDVLK, o driver proprietário da NVIDIA e qualquer outro que suporte Vulkan 1.0."),
+                ("text", "A camada se atém ao Vulkan 1.0 base e à extensão de swapchain, então nada aqui se comporta diferente de um driver para outro."),
             )
         },
-        "How it Works": {
-            "The volt Layer": (
-                ("text", "Every setting in this application is written to a profile file at ~/.config/volt-gui/. The volt Vulkan layer reads that profile when a game starts and rewrites the Vulkan calls the game makes: samplers for texture filtering and mip selection, the swapchain for vsync, image count and compositing, device enumeration for GPU selection, presents for the frame limiter, and pipelines for the rendering toggles."),
-                ("text", "Settings are read once when a game starts and never change while it runs. Press Apply, then start the game again. The probe runs again on Apply so the lists here stay in step."),
+        "Como Funciona": {
+            "A Camada volt": (
+                ("text", "Cada configuração neste aplicativo é gravada em um arquivo de perfil em ~/.config/volt-gui/. A camada Vulkan do volt lê esse perfil quando um jogo inicia e reescreve as chamadas Vulkan que o jogo faz: amostradores para filtragem de textura e seleção de mip, a swapchain para vsync, contagem de imagens e composição, enumeração de dispositivos para seleção de GPU, presents para o limitador de quadros e pipelines para os controles de renderização."),
+                ("text", "As configurações são lidas uma vez quando um jogo inicia e nunca mudam enquanto ele roda. Pressione Aplicar, depois inicie o jogo novamente. A sondagem roda novamente ao Aplicar para que as listas aqui fiquem sincronizadas."),
             ),
-            "What it Will Not Do": (
-                ("text", "volt only changes what the game asks Vulkan for. It never draws anything itself, so sharpening, upscaling, frame generation, forced MSAA and overlays are all out of scope. Use MangoHud for an overlay and LACT for clocks and fan curves, or CoreCtrl if you also want CPU controls."),
-                ("text", "It also never turns anything on that the game left off. volt enables no device feature and no extension. Where a setting needs a feature, volt reads what the game asked for and applies the setting only if the game enabled it: that is how Anisotropic Filtering, Sample Shading, Alpha To One and Depth Clamp work, and where the game left the feature clear the setting is ignored and a line is logged. A setting that cannot be reached that way at all stays out, which keeps line width and cubic filtering off the table, and forced wireframe stays out because it is a wallhack. Where a game moves state onto an extension path, volt follows it there: a hook for an extension the game never enabled is simply unreachable."),
+            "O Que Não Faz": (
+                ("text", "O volt apenas muda o que o jogo pede ao Vulkan. Ele nunca desenha nada por conta própria, então nitidez, upscaling, geração de quadros, MSAA forçado e sobreposições estão fora de escopo. Use MangoHud para sobreposição e LACT para clocks e curvas de ventoinha, ou CoreCtrl se também quiser controles de CPU."),
+                ("text", "Também nunca ativa nada que o jogo deixou desligado. O volt não habilita nenhum recurso de dispositivo nem extensão. Onde uma configuração precisa de um recurso, o volt lê o que o jogo pediu e aplica a configuração apenas se o jogo habilitou: é assim que Filtragem Anisotrópica, Sombreamento por Amostra, Alfa para Um e Limite de Profundidade funcionam, e onde o jogo deixou o recurso desmarcado a configuração é ignorada e uma linha é registrada. Uma configuração que não pode ser alcançada dessa forma fica de fora, o que mantém largura de linha e filtragem cúbica fora da mesa, e wireframe forçado fica de fora porque é wallhack. Onde um jogo move estado para um caminho de extensão, o volt o segue até lá: um gancho para uma extensão que o jogo nunca habilitou é simplesmente inalcançável."),
             )
         },
-        "Settings": {
-            "One Value Per Setting": (
-                ("text", "Every setting is a single choice: the value volt forces, or default, which means volt does not touch what the game asked for. There is no range, no ordering between values, and nothing to get backwards."),
-                ("text", "A value volt has no name for still appears in the list, still saves to a profile, and still applies, exactly like a named one."),
-                ("text", "Where the specification admits only what a query returned, a value your device did not report is not forced. volt keeps the game's own value and logs a warning, so a profile written on another machine never makes a call invalid."),
-                ("text", "Where the specification bounds a value, LOD bias against your device limit and image count against what the surface allows, volt clamps what it passes down. That clamp is correctness rather than a choice, so it is not shown here."),
+        "Configurações": {
+            "Um Valor por Configuração": (
+                ("text", "Cada configuração é uma escolha única: o valor que o volt força, ou padrão, que significa que o volt não toca no que o jogo pediu. Não há intervalo, nem ordenação entre valores, e nada para confundir."),
+                ("text", "Um valor para o qual o volt não tem nome ainda aparece na lista, ainda salva no perfil e ainda aplica, exatamente como um nomeado."),
+                ("text", "Onde a especificação admite apenas o que uma consulta retornou, um valor que seu dispositivo não reportou não é forçado. O volt mantém o valor do jogo e registra um aviso, então um perfil escrito em outra máquina nunca invalida uma chamada."),
+                ("text", "Onde a especificação limita um valor, viés LOD contra o limite do seu dispositivo e contagem de imagens contra o que a superfície permite, o volt limita o que repassa. Esse limite é correção, não escolha, então não é mostrado aqui."),
             ),
-            "Where the Lists Come From": (
-                ("text", "Many of the boxes are filled in from your own hardware rather than from a list built into volt-gui. Present modes, image counts and alpha modes come from what the surface reports, the GPU list comes from what the driver enumerates, and anisotropy, mip levels and LOD bias run up to the limits your device gives. A card without the feature behind it holds nothing but default, and so does every device backed card until the probe has run: volt-gui offers no option it has not read."),
-                ("text", "That means a present mode volt has never heard of shows up as soon as your driver supports it. It also means a profile written on another machine can name something this one cannot do, in which case that setting resets to default and volt-gui tells you which ones."),
-                ("text", "The rest carry fixed lists, because there is nothing to read. Nearest and linear are core Vulkan with no feature and no query behind them, so every driver has both and none of them says so. The Framerate settings have nothing to read at all: a game never tells Vulkan what frame rate it wants, so there is nothing on the device to ask."),
+            "De Onde Vêm as Listas": (
+                ("text", "Muitas das caixas são preenchidas a partir do seu próprio hardware em vez de uma lista embutida no volt-gui. Modos de apresentação, contagens de imagem e modos alfa vêm do que a superfície reporta, a lista de GPUs vem do que o driver enumera, e anisotropia, níveis de mip e viés LOD vão até os limites que seu dispositivo oferece. Um cartão sem o recurso por trás contém apenas padrão, e todo cartão baseado em dispositivo também, até a sondagem rodar: o volt-gui não oferece opção que não leu."),
+                ("text", "Isso significa que um modo de apresentação que o volt nunca ouviu falar aparece assim que seu driver o suporta. Também significa que um perfil escrito em outra máquina pode nomear algo que esta não consegue fazer, caso em que essa configuração volta ao padrão e o volt-gui diz quais."),
+                ("text", "O resto traz listas fixas, porque não há nada para ler. Nearest e linear são Vulkan base sem recurso nem consulta por trás, então todo driver tem ambos e nenhum diz isso. As configurações de Taxa de Quadros não têm nada para ler: um jogo nunca diz ao Vulkan qual taxa de quadros quer, então não há nada no dispositivo para perguntar."),
             ),
-            "The Three Filter Cards": (
-                ("text", "Three sampler fields, three cards. Nothing overrides anything, and every combination is reachable."),
-                ("text", "In the order magnification, minification, mipmap:\n\n- retro: nearest, nearest, nearest.\n- bilinear: linear, linear, nearest.\n- trilinear: linear, linear, linear.\n- sharp pixel art without distant shimmer: nearest, linear, linear."),
-                ("text", "Magnification is what you see up close. Minification is most of the screen, and where mipmaps and anisotropic filtering do their work. Mipmap Mode is the blend between levels."),
+            "Os Três Cartões de Filtro": (
+                ("text", "Três campos de amostrador, três cartões. Nada sobrescreve nada, e toda combinação é alcançável."),
+                ("text", "Na ordem ampliação, redução, mipmap:\n\n- retrô: nearest, nearest, nearest.\n- bilinear: linear, linear, nearest.\n- trilinear: linear, linear, linear.\n- pixel art nítido sem cintilação distante: nearest, linear, linear."),
+                ("text", "Ampliação é o que você vê de perto. Redução é a maior parte da tela, e onde mipmaps e filtragem anisotrópica atuam. Modo Mipmap é a mistura entre níveis."),
             ),
-            "The Frame Limiter": (
-                ("text", "Frame Limit caps the rate at present time. Offset shifts that cap, Cadence sets which rate the limiter aims at, Method sets when it waits, Pacing sets how, and none of the four does anything until Limit is set."),
-                ("text", "Offset is there for variable refresh displays, which want the cap sitting just under refresh. Pick 144, set the offset to -6, and you land on 138. volt does not read your refresh rate and never shifts a cap by itself, since most displays are not VRR."),
-                ("text", "Cadence is the rate the limiter aims at. fixed is your cap and nothing else. smooth paces at the slowest of the last few frames, so the fast frames wait for the slow ones and the cadence comes out even at whatever the machine is holding. dynamic reads exactly what smooth reads and then rounds it down to a quarter step of your cap, so it sits on a set rate rather than following the load. The steps are quarter steps of your cap's frame time, so they sit close together low down and far apart up top: a 60 cap steps 60, 48, 40, 34, 30, while a 240 cap steps 240, 192, 160, 137, 120. Both come from how consoles handle a machine that cannot hold its target, which is picking a rate it can hold and staying there. A console drops resolution to get there and volt cannot touch resolution, so frame handling is the one place the idea fits. A limiter can only make frames later, which is why neither reads the average: a frame slower than the average could never be paced up to it. Both climb back on their own, and neither goes faster than your cap. The trade is frames for evenness: fixed does nothing at all once the machine falls under the cap, so what you get is whatever the machine produced, one frame long and the next short. smooth and dynamic hold the short frames back to match the long ones, which costs you the frames you would have seen and buys you even spacing. dynamic changing step is visible, but it is one change rather than a different frame time every frame. Set fixed if the machine holds the cap, or if you want every frame you can get for the input latency."),
-                ("text", "Cadence and Method are separate boxes because they answer different questions, and any pair of them works together. dynamic with late holds a set rate and still reads input as close to display time as it can."),
-                ("text", "Pacing runs from cheapest to tightest. sleep hands the whole wait to the kernel and costs nothing. sliced sleeps in short steps and rechecks the clock, which corrects for the kernel waking late. precise sleeps most of the interval then busy waits half a millisecond. spin busy waits the whole interval, the steadiest of the four and the only one that keeps a core awake."),
+            "O Limitador de Quadros": (
+                ("text", "Limite de Quadros limita a taxa no momento da apresentação. Deslocamento desloca esse limite, Cadência define em qual taxa o limitador mira, Método define quando ele espera, Ritmo define como, e nenhum dos quatro faz nada até que Limite esteja definido."),
+                ("text", "Deslocamento existe para telas com taxa variável, que querem o limite logo abaixo da atualização. Escolha 144, defina o deslocamento para -6 e você cai em 138. O volt não lê sua taxa de atualização e nunca desloca um limite sozinho, já que a maioria das telas não é VRR."),
+                ("text", "Cadência é a taxa na qual o limitador mira. fixed é seu limite e nada mais. smooth ritma no mais lento dos últimos quadros, então os quadros rápidos esperam pelos lentos e a cadência sai uniforme no que a máquina está sustentando. dynamic lê exatamente o que smooth lê e então arredonda para baixo até um quarto de passo do seu limite, então fica em uma taxa fixa em vez de seguir a carga. Os passos são quartos do tempo de quadro do seu limite, então ficam próximos embaixo e distantes em cima: um limite de 60 passa por 60, 48, 40, 34, 30, enquanto um de 240 passa por 240, 192, 160, 137, 120. Ambos vêm de como consoles lidam com uma máquina que não sustenta seu alvo, que é escolher uma taxa que consegue sustentar e ficar nela. Um console reduz resolução para chegar lá e o volt não toca em resolução, então tratamento de quadros é o único lugar onde a ideia se encaixa. Um limitador só pode atrasar quadros, por isso nenhum lê a média: um quadro mais lento que a média nunca poderia ser ritmado para cima até ela. Ambos sobem sozinhos, e nenhum vai mais rápido que seu limite. A troca é quadros por uniformidade: fixed não faz nada quando a máquina cai abaixo do limite, então o que você recebe é o que a máquina produziu, um quadro longo e o próximo curto. smooth e dynamic seguram os quadros curtos para coincidir com os longos, o que custa os quadros que você teria visto e compra espaçamento uniforme. A mudança de passo do dynamic é visível, mas é uma mudança em vez de um tempo de quadro diferente a cada quadro. Use fixed se a máquina sustenta o limite, ou se quer cada quadro possível pela latência."),
+                ("text", "Cadência e Método são caixas separadas porque respondem perguntas diferentes, e qualquer par funciona junto. dynamic com late mantém uma taxa fixa e ainda lê a entrada o mais próximo possível do momento de exibição."),
+                ("text", "Ritmo vai do mais barato ao mais preciso. sleep entrega toda a espera ao kernel e não custa nada. sliced dorme em passos curtos e re-verifica o relógio, o que corrige quando o kernel acorda atrasado. precise dorme a maior parte do intervalo e então espera ocupada por meio milissegundo. spin espera ocupada o intervalo inteiro, o mais estável dos quatro e o único que mantém um núcleo acordado."),
             ),
-            "Every Setting Forces, Bar One": (
-                ("text", "volt writes the value you picked into its own copy of the structure that carries it, so a setting lands whether or not the game consulted a query first. That holds for every card here except one."),
-                ("text", "Physical Device is the exception, and it is a fact about Vulkan rather than a choice. Nothing names the device a swapchain runs on: the game already holds a physical device by the time volt sees anything it could patch. Hiding the others from enumeration is the only lever there is, so a game that ignores enumeration order keeps the device it picked."),
-                ("text", "Where a query governs what is legal, volt filters that too. A present mode must be one the surface reported, so filtering the query means a game picking the first entry it is offered gets the right value without volt overriding anything, and a game that hardcodes gets it at the create call instead. Both halves, one setting."),
-                ("text", "A forced value the device did not report is not forced. Where the surface turns down the present mode or the composite alpha you named, volt keeps the game's own value and logs a warning. It never passes down a value that would make the call invalid."),
+            "Toda Configuração Força, Exceto Uma": (
+                ("text", "O volt grava o valor que você escolheu em sua própria cópia da estrutura que o carrega, então uma configuração se aplica quer o jogo tenha consultado uma query antes ou não. Isso vale para cada cartão aqui exceto um."),
+                ("text", "Dispositivo Físico é a exceção, e é um fato sobre Vulkan, não uma escolha. Nada nomeia o dispositivo em que uma swapchain roda: o jogo já possui um dispositivo físico quando o volt vê algo que poderia corrigir. Esconder os outros da enumeração é a única alavanca, então um jogo que ignora a ordem de enumeração mantém o dispositivo que escolheu."),
+                ("text", "Onde uma consulta governa o que é legal, o volt também filtra isso. Um modo de apresentação deve ser um que a superfície reportou, então filtrar a consulta significa que um jogo que pega a primeira entrada oferecida recebe o valor certo sem o volt sobrescrever nada, e um jogo que codifica fixo recebe na chamada de criação. Ambas as metades, uma configuração."),
+                ("text", "Um valor forçado que o dispositivo não reportou não é forçado. Onde a superfície recusa o modo de apresentação ou o alfa composto que você nomeou, o volt mantém o valor do jogo e registra um aviso. Ele nunca repassa um valor que invalidaria a chamada."),
             )
         },
-        "Usage": {
-            "Launching Games": (
-                ("text", "Prepend the volt launcher to your game command. It activates the layer for that process only and selects the profile:"),
-                ("code", "volt -- %command%", "Steam (Launch Options, default profile):"),
-                ("code", "volt myprofile -- %command%", "Steam (named profile):"),
-                ("code", "volt -- ./game", "Terminal:"),
-                ("code", "volt -- flatpak run com.example.Game", "Flatpak:"),
+        "Uso": {
+            "Iniciando Jogos": (
+                ("text", "Adicione o lançador volt antes do comando do seu jogo. Ele ativa a camada apenas para aquele processo e seleciona o perfil:"),
+                ("code", "volt -- %command%", "Steam (Opções de inicialização, perfil padrão):"),
+                ("code", "volt meuperfil -- %command%", "Steam (perfil nomeado):"),
+                ("code", "volt -- ./jogo", "Terminal:"),
+                ("code", "volt -- flatpak run com.example.Jogo", "Flatpak:"),
             ),
-            "Default Behavior": (
-                ("text", "Every setting defaults to \"default\", which means the layer does not touch that value and the application keeps its own choice. A profile with everything on default is a true passthrough."),
+            "Comportamento Padrão": (
+                ("text", "Toda configuração tem padrão \"default\", o que significa que a camada não toca nesse valor e o aplicativo mantém sua própria escolha. Um perfil com tudo em padrão é um passthrough verdadeiro."),
             ),
-            "Seeing What Applied": (
-                ("text", "Run the game from a terminal with VOLT_LOG=info and the layer prints what it applied, what the surface or the device turned down, and when it picked up a changed profile."),
-                ("code", "VOLT_LOG=info volt -- ./game", ""),
-                ("text", "Every setting gets a line, naming the value the game asked for and the value volt wrote in its place. No forced value means volt left that setting alone, either because it is default or because the game already asked for what you picked. The forced value is the one volt wrote, so a setting the device clamped shows what landed rather than what you picked."),
-                ("text", "A setting that needs a device feature the game left clear names that feature instead. The Framerate settings have no asked value, since a game never tells Vulkan what frame rate it wants, so they report what volt forced or say the profile did not set them."),
-                ("text", "The GPU line reports the device id as `forced N` when you set a gpu, and `asked N` when you don't."),
-                ("text", "Each setting prints once per device, so 21 lines at most however many samplers, pipelines or swapchains the game creates."),
+            "Vendo o Que Foi Aplicado": (
+                ("text", "Execute o jogo por um terminal com VOLT_LOG=info e a camada imprime o que aplicou, o que a superfície ou o dispositivo recusou e quando captou um perfil alterado."),
+                ("code", "VOLT_LOG=info volt -- ./jogo", ""),
+                ("text", "Cada configuração ganha uma linha, nomeando o valor que o jogo pediu e o valor que o volt escreveu em seu lugar. Nenhum valor forçado significa que o volt deixou essa configuração em paz, seja porque é padrão ou porque o jogo já pediu o que você escolheu. O valor forçado é o que o volt escreveu, então uma configuração que o dispositivo limitou mostra o que foi efetivado em vez do que você escolheu."),
+                ("text", "Uma configuração que precisa de um recurso de dispositivo que o jogo deixou desmarcado nomeia esse recurso. As configurações de Taxa de Quadros não têm valor pedido, já que um jogo nunca diz ao Vulkan qual taxa quer, então elas reportam o que o volt forçou ou dizem que o perfil não as definiu."),
+                ("text", "A linha da GPU reporta o id do dispositivo como `forçado N` quando você define uma gpu, e `pedido N` quando não."),
+                ("text", "Cada configuração imprime uma vez por dispositivo, então no máximo 21 linhas por mais samplers, pipelines ou swapchains que o jogo crie."),
             ),
-            "The Probe": (
-                ("text", "volt-gui runs volt-probe under the profile you are editing. It is what fills the setting lists with your hardware. Pressing Apply runs it again so those lists match the values you just saved, and switching profiles runs it again too."),
-                ("text", "It opens a one pixel window that is never mapped, creates a surface, a swapchain and a sampler so the layer sees every path it needs, records what the device reported, and exits. Nothing appears on screen and nothing is drawn."),
-                ("text", "It opens an X11 surface, which every desktop has, since a Wayland session runs XWayland. That is not the only surface a game opens: Wine and Proton have native Wayland drivers, and gamescope is its own path again. The profile is written before any of them exists, so volt cannot know which one the game will pick, and reporting two backends would offer you values belonging to the path the game did not take."),
-                ("text", "Present modes, image counts and alpha modes are answered against a surface rather than against the card, so your display path bounds them as much as your hardware does, and a short list there is the answer rather than a failure. Those three cards are also the only ones this touches. The lists mostly agree across backends, and where they do not, the layer already handles it: image count is clamped against the surface the game actually opened, and a present mode or alpha mode that surface turns down leaves the game's own value alone with a line in the log. Reading a native Wayland surface directly is on the list for later."),
-                ("text", "volt-probe is built by make and installed next to volt and volt-gui, so there is nothing extra to fetch. It links libxcb, which every desktop already carries."),
-                ("code", "volt --probe myprofile -- volt-probe", "Run it yourself:"),
+            "A Sondagem": (
+                ("text", "O volt-gui executa o volt-probe sob o perfil que você está editando. É o que preenche as listas de configuração com seu hardware. Pressionar Aplicar o executa novamente para que essas listas coincidam com os valores que você acabou de salvar, e trocar de perfis também o executa."),
+                ("text", "Ele abre uma janela de um pixel que nunca é mapeada, cria uma superfície, uma swapchain e um amostrador para que a camada veja cada caminho necessário, registra o que o dispositivo reportou e sai. Nada aparece na tela e nada é desenhado."),
+                ("text", "Abre uma superfície X11, que todo desktop tem, já que uma sessão Wayland roda XWayland. Essa não é a única superfície que um jogo abre: Wine e Proton têm drivers Wayland nativos, e gamescope é outro caminho. O perfil é gravado antes de qualquer um existir, então o volt não sabe qual o jogo escolherá, e reportar dois backends ofereceria valores do caminho que o jogo não tomou."),
+                ("text", "Modos de apresentação, contagens de imagem e modos alfa são respondidos contra uma superfície em vez de contra a placa, então seu caminho de exibição os limita tanto quanto seu hardware, e uma lista curta ali é a resposta, não falha. Esses três cartões são os únicos que isso toca. As listas na maioria concordam entre backends, e onde não, a camada já lida: contagem de imagens é limitada contra a superfície que o jogo realmente abriu, e um modo de apresentação ou alfa que a superfície recusa deixa o valor do jogo em paz com uma linha no log. Ler uma superfície Wayland nativa diretamente está na lista para depois."),
+                ("text", "O volt-probe é compilado pelo make e instalado ao lado do volt e volt-gui, então não há nada extra para buscar. Ele vincula libxcb, que todo desktop já carrega."),
+                ("code", "volt --probe meuperfil -- volt-probe", "Execute você mesmo:"),
             )
         },
-        "Profiles": {
-            "Profiles": (
-                ("text", "Create profiles to switch between configurations per game.\n\n1. Open the profile selector and choose New Profile.\n2. Configure and Apply settings.\n3. Launch the game with that profile name, or switch profiles from the System Tray."),
-                ("text", "The launch command shown next to the Apply button always matches the selected profile and can be copied directly into Steam."),
+        "Perfis": {
+            "Perfis": (
+                ("text", "Crie perfis para alternar entre configurações por jogo.\n\n1. Abra o seletor de perfis e escolha Novo Perfil.\n2. Configure e Aplique as configurações.\n3. Inicie o jogo com o nome daquele perfil, ou troque de perfis pela Bandeja do Sistema."),
+                ("text", "O comando de inicialização mostrado ao lado do botão Aplicar sempre corresponde ao perfil selecionado e pode ser copiado direto para a Steam."),
             )
         },
-        "Presets": {
-            "Presets": (
-                ("text", "Presets fill the profile you have open with a starting point, arranged as a ladder from best looking to fastest:\n\n- Quality: trilinear filtering, a slight sharpening bias, every mip level allowed, 16x anisotropy, smoothed cutout edges, classic vsync, a 4 image swapchain, and precise pacing on an early wait.\n- Balanced: trilinear still, mailbox present for vsync without the latency, 8x anisotropy, sliced pacing.\n- Performance FPS: bilinear, a blurring bias, mailbox present, the swapchain held to 4 images and the cheaper sleep pacing.\n- Performance Low Latency: the same, aimed at input lag instead, with immediate present, a 2 image swapchain, a late wait and spin pacing, the steadiest of the four.\n- Potato FPS: bilinear, anisotropy off, a full step of blurring bias, the top two mips off the table, cutout smoothing off.\n- Potato Low Latency: the same again with immediate present, a 2 image swapchain and a late wait.\n\nNo preset touches Composite Alpha or Clipped Presentation: those depend on your compositor, so they stay yours."),
-                ("text", "Applying a preset replaces every value in the profile after a confirmation, so anything the preset does not set goes back to default. That includes the frame limit: the right cap depends on your display, so that choice stays yours."),
-                ("text", "A preset can name something your hardware does not offer, mailbox on a surface without it for instance. That setting resets to default and volt-gui says which ones, so the rest of the preset still lands."),
-                ("text", "The filter presets are also the answer to what the three filter cards should be set to. Quality and Balanced are trilinear, the rest are bilinear with hard mip cuts, and every one of them is spelled out card by card in The Three Filter Cards above."),
+        "Predefinições": {
+            "Predefinições": (
+                ("text", "Predefinições preenchem o perfil que você tem aberto com um ponto de partida, organizadas em escada do mais bonito ao mais rápido:\n\n- Qualidade: filtragem trilinear, leve viés de nitidez, todos os níveis de mip permitidos, anisotropia 16x, bordas recortadas suavizadas, vsync clássico, swapchain de 4 imagens e ritmo precise em espera early.\n- Equilibrado: ainda trilinear, mailbox para vsync sem latência, anisotropia 8x, ritmo sliced.\n- Desempenho FPS: bilinear, viés de borramento, mailbox, swapchain mantida em 4 imagens e ritmo sleep mais barato.\n- Desempenho Baixa Latência: o mesmo, mirando latência em vez disso, com present immediate, swapchain de 2 imagens, espera late e ritmo spin, o mais estável dos quatro.\n- Batata FPS: bilinear, anisotropia desligada, um passo completo de viés de borramento, os dois mips superiores fora da mesa, suavização de recorte desligada.\n- Batata Baixa Latência: o mesmo novamente com present immediate, swapchain de 2 imagens e espera late.\n\nNenhuma predefinição toca em Alfa Composto ou Apresentação Recortada: esses dependem do seu compositor, então continuam seus."),
+                ("text", "Aplicar uma predefinição substitui cada valor no perfil após confirmação, então qualquer coisa que a predefinição não define volta ao padrão. Isso inclui o limite de quadros: o limite certo depende da sua tela, então essa escolha continua sua."),
+                ("text", "Uma predefinição pode nomear algo que seu hardware não oferece, mailbox em uma superfície sem ele por exemplo. Essa configuração volta ao padrão e o volt-gui diz quais, então o resto da predefinição ainda se aplica."),
+                ("text", "As predefinições de filtro também são a resposta para como os três cartões de filtro devem ser definidos. Qualidade e Equilibrado são trilinear, o resto é bilinear com cortes duros de mip, e cada um deles é explicado cartão por cartão em Os Três Cartões de Filtro acima."),
             )
         },
-        "Options": {
-            "Options": (
-                ("text", "Changes to Options are saved automatically but only take effect after restarting volt-gui. This includes the theme, scaling, tray behavior, and all other preferences."),
+        "Opções": {
+            "Opções": (
+                ("text", "Mudanças em Opções são salvas automaticamente mas só têm efeito após reiniciar o volt-gui. Isso inclui o tema, escala, comportamento da bandeja e todas as outras preferências."),
             )
         },
     }
@@ -113,7 +113,7 @@ def get_welcome_settings() -> dict:
 
 def create_welcome_window_widget() -> QMainWindow:
     window = QMainWindow()
-    window.setWindowTitle("volt-gui Welcome")
+    window.setWindowTitle("Boas-vindas ao volt-gui")
     window.setMinimumSize(620, 380)
     central_widget = QWidget()
     main_layout = QVBoxLayout(central_widget)
@@ -135,7 +135,7 @@ def create_welcome_window_widget() -> QMainWindow:
     button_layout.setContentsMargins(8, 8, 8, 8)
     button_layout.setSpacing(8)
     button_layout.setAlignment(Qt.AlignVCenter)
-    close_button = QPushButton("Close")
+    close_button = QPushButton("Fechar")
     close_button.setFixedSize(get_standard_button_width(), get_standard_button_height())
     close_button.clicked.connect(window.close)
     button_layout.addStretch(1)
