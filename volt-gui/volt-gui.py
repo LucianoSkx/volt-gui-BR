@@ -6,9 +6,11 @@ import sys
 
 from typing import Final
 
+from PySide6.QtCore import QLocale
 from PySide6.QtCore import QProcess
 from PySide6.QtCore import Qt
 from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTranslator
 from PySide6.QtGui import QAction
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
@@ -66,8 +68,8 @@ from welcome import create_welcome_window_widget
 
 SINGLETON_PORT: Final[int] = 47832
 OPTIONS_SAVE_DEBOUNCE_MS: Final[int] = 500
-NEW_PROFILE_LABEL: Final[str] = "New Profile..."
-DELETE_PROFILE_LABEL: Final[str] = "Delete Current"
+NEW_PROFILE_LABEL: Final[str] = "Novo Perfil..."
+DELETE_PROFILE_LABEL: Final[str] = "Excluir Atual"
 SCALE_MIN: Final[float] = 0.5
 SCALE_MAX: Final[float] = 3.0
 DEFAULT_SCALE: Final[str] = "1.0"
@@ -79,7 +81,7 @@ PREVIEW_STOP_MS: Final[int] = 1500
 BUNDLE_ATTR: Final[str] = "_MEIPASS"
 BUNDLE_VARS: Final[tuple] = ("LD_LIBRARY_PATH", "LD_PRELOAD")
 PATH_VAR: Final[str] = "PATH"
-PROBE_FAILED_ERROR: Final[str] = "volt-probe failed to run.\n\nWithout it volt-gui cannot read your hardware, so every setting fed by the device holds nothing but default.\n\nvolt-probe installs next to volt and volt-gui. Check that their directory is on your PATH, then restart volt-gui."
+PROBE_FAILED_ERROR: Final[str] = "Falha ao executar o volt-probe.\n\nSem ele o volt-gui não consegue ler seu hardware, então toda configuração alimentada pelo dispositivo mantém apenas o padrão.\n\nO volt-probe é instalado ao lado do volt e do volt-gui. Verifique se o diretório deles está no seu PATH e reinicie o volt-gui."
 
 
 def build_preview_args(profile_name: str) -> list:
@@ -264,14 +266,17 @@ def process_yes_no_dialog(parent_widget, title: str, message: str) -> bool:
     dialog = QMessageBox(parent_widget)
     dialog.setWindowTitle(title)
     dialog.setText(message)
-    dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    yes_button = dialog.addButton("Sim", QMessageBox.YesRole)
+    no_button = dialog.addButton("Não", QMessageBox.NoRole)
+    dialog.setDefaultButton(yes_button)
     button_box = dialog.findChild(QDialogButtonBox)
     match button_box is None:
         case False:
             button_box.setCenterButtons(True)
         case True:
             pass
-    return dialog.exec() == QMessageBox.Yes
+    dialog.exec()
+    return dialog.clickedButton() == yes_button
 
 
 def is_new_profile_name_valid(profile_name: str) -> bool:
@@ -283,7 +288,7 @@ def is_new_profile_name_valid(profile_name: str) -> bool:
 
 
 def process_new_profile_save(main_window) -> None:
-    profile_name, accepted = QInputDialog.getText(main_window, "New Profile", "Profile name:")
+    profile_name, accepted = QInputDialog.getText(main_window, "Novo Perfil", "Nome do perfil:")
     match (accepted, profile_name is not None and is_new_profile_name_valid(profile_name)):
         case (True, True):
             process_profile_save(main_window.all_widgets, main_window.current_profile)
@@ -293,10 +298,10 @@ def process_new_profile_save(main_window) -> None:
             process_profile_selector_restore(main_window)
             process_launch_line_update(main_window)
             process_tray_menu_update(main_window)
-            process_notification_display(main_window, "Profile '" + profile_name.strip() + "' created.", False)
+            process_notification_display(main_window, "Perfil '" + profile_name.strip() + "' criado.", False)
             return None
         case (True, False):
-            process_notification_display(main_window, "Profile name invalid or already exists.", True)
+            process_notification_display(main_window, "Nome de perfil inválido ou já existe.", True)
             return None
         case _:
             return None
@@ -305,10 +310,10 @@ def process_new_profile_save(main_window) -> None:
 def process_current_profile_delete(main_window) -> None:
     match main_window.current_profile == DEFAULT_PROFILE:
         case True:
-            process_notification_display(main_window, "Cannot delete default profile.", True)
+            process_notification_display(main_window, "Não é possível excluir o perfil padrão.", True)
             return None
         case False:
-            match process_yes_no_dialog(main_window, "Delete Profile", "Delete profile '" + main_window.current_profile + "'?"):
+            match process_yes_no_dialog(main_window, "Excluir Perfil", "Excluir perfil '" + main_window.current_profile + "'?"):
                 case False:
                     return None
                 case True:
@@ -319,7 +324,7 @@ def process_current_profile_delete(main_window) -> None:
                     process_profile_widget_load(main_window.all_widgets, DEFAULT_PROFILE)
                     process_launch_line_update(main_window)
                     process_tray_menu_update(main_window)
-                    process_notification_display(main_window, "Profile deleted.", False)
+                    process_notification_display(main_window, "Perfil excluído.", False)
                     return None
 
 
@@ -344,11 +349,11 @@ def process_preset_combo_change(main_window, selected_text: str) -> None:
             build_preset_combo_items(main_window.preset_selector)
             return None
         case (False, True):
-            match process_yes_no_dialog(main_window, "Apply Preset", "Apply '" + selected_text + "' to '" + main_window.current_profile + "'? All values will be replaced."):
+            match process_yes_no_dialog(main_window, "Aplicar Predefinição", "Aplicar '" + selected_text + "' em '" + main_window.current_profile + "'? Todos os valores serão substituídos."):
                 case True:
                     dropped = process_preset_apply(main_window.all_widgets, selected_text)
                     process_profile_save(main_window.all_widgets, main_window.current_profile)
-                    process_notification_display(main_window, "Preset '" + selected_text + "' applied to profile '" + main_window.current_profile + "'.", False)
+                    process_notification_display(main_window, "Predefinição '" + selected_text + "' aplicada ao perfil '" + main_window.current_profile + "'.", False)
                     process_dropped_notice(main_window, dropped)
                 case False:
                     pass
@@ -364,12 +369,12 @@ def create_system_tray_widget(main_window) -> None:
             main_window.tray_icon = QSystemTrayIcon(main_window)
             main_window.tray_icon.setIcon(QIcon.fromTheme("preferences-system"))
             menu = QMenu()
-            menu.addAction(QAction("Show", main_window, triggered=lambda: process_window_show(main_window)))
-            main_window.profile_submenu = QMenu("Apply Profile", menu)
+            menu.addAction(QAction("Mostrar", main_window, triggered=lambda: process_window_show(main_window)))
+            main_window.profile_submenu = QMenu("Aplicar Perfil", menu)
             process_tray_menu_update(main_window)
             menu.addMenu(main_window.profile_submenu)
             menu.addSeparator()
-            menu.addAction(QAction("Quit", main_window, triggered=lambda: process_application_quit(main_window)))
+            menu.addAction(QAction("Sair", main_window, triggered=lambda: process_application_quit(main_window)))
             main_window.tray_icon.setContextMenu(menu)
             main_window.tray_icon.show()
             main_window.tray_icon.activated.connect(lambda activation_reason: process_tray_activation(main_window, activation_reason))
@@ -383,7 +388,7 @@ def process_tray_menu_update(main_window) -> None:
         case True:
             main_window.profile_submenu.clear()
             for profile_name in find_all_profiles():
-                action = QAction("Apply " + profile_name, main_window)
+                action = QAction("Aplicar " + profile_name, main_window)
                 action.triggered.connect(lambda checked, bound_profile_name=profile_name: process_profile_apply_from_tray(main_window, bound_profile_name))
                 main_window.profile_submenu.addAction(action)
             return None
@@ -594,9 +599,9 @@ def process_dropped_notice(main_window, dropped: tuple) -> None:
         case _:
             process_notification_display(
                 main_window,
-                "This device cannot provide "
+                "Este dispositivo não pode fornecer "
                 + ", ".join(key.split(":")[-1].split(".")[-1] for key in dropped)
-                + ", reset to default.",
+                + ", redefinido para padrão.",
                 True)
             return None
 
@@ -623,7 +628,7 @@ def process_all_settings_apply(main_window) -> None:
     process_application_options_save(main_window)
     process_profile_save(main_window.all_widgets, main_window.current_profile)
     process_preview_start(main_window)
-    process_notification_display(main_window, "Profile '" + main_window.current_profile + "' saved. Start a game again to pick it up.", False)
+    process_notification_display(main_window, "Perfil '" + main_window.current_profile + "' salvo. Inicie o jogo novamente para aplicar.", False)
     return None
 
 
@@ -697,7 +702,7 @@ def validate_singleton_instance(singleton_port: int) -> dict:
 
 
 def process_signal_handler(main_window, signal_number: int) -> None:
-    print("\nReceived signal " + str(signal_number) + ", closing...")
+    print("\nSinal recebido " + str(signal_number) + ", fechando...")
     process_cleanup(main_window, main_window.singleton_socket)
     QApplication.quit()
     sys.exit(0)
@@ -777,16 +782,16 @@ def create_main_window_widget(singleton_socket):
     bottom_bar_layout.setAlignment(Qt.AlignBottom)
     preset_combo = QComboBox()
     preset_combo.setView(QListView())
-    preset_combo.setFixedSize(get_standard_button_width(), get_standard_button_height())
+    preset_combo.setFixedSize(140, get_standard_button_height())
     preset_combo.setFocusPolicy(Qt.ClickFocus)
     window.preset_selector = preset_combo
     build_preset_combo_items(preset_combo)
     profile_combo = QComboBox()
     profile_combo.setView(QListView())
-    profile_combo.setFixedSize(get_standard_button_width(), get_standard_button_height())
+    profile_combo.setFixedSize(130, get_standard_button_height())
     profile_combo.setFocusPolicy(Qt.ClickFocus)
     window.profile_selector = profile_combo
-    apply_button = QPushButton("Apply")
+    apply_button = QPushButton("Aplicar")
     apply_button.setFixedSize(get_standard_button_width(), get_standard_button_height())
     apply_button.clicked.connect(lambda: process_all_settings_apply(window))
     bottom_bar_layout.addStretch(1)
@@ -837,14 +842,14 @@ def create_main_window_widget(singleton_socket):
 def main() -> None:
     match os.environ.get("SUDO_USER") is not None:
         case True:
-            print("Error: Do not run with sudo.\nRun as regular user.")
+            print("Erro: Não execute com sudo.\nExecute como usuário comum.")
             sys.exit(1)
         case False:
             pass
     singleton_result = validate_singleton_instance(SINGLETON_PORT)
     match singleton_result["running"]:
         case True:
-            print("volt-gui is already running.")
+            print("volt-gui já está em execução.")
             sys.exit(0)
         case False:
             pass
@@ -852,6 +857,11 @@ def main() -> None:
     call_clean_environment()
     calculate_initial_scale()
     application = QApplication(sys.argv)
+    translator = QTranslator(application)
+    for path in ("/usr/share/qt6/translations", "/usr/share/qt/translations"):
+        if translator.load(QLocale("pt_BR"), "qt", "_", path) or translator.load(QLocale("pt"), "qt", "_", path):
+            application.installTranslator(translator)
+            break
     application.setStyle("Fusion")
     application.setQuitOnLastWindowClosed(False)
     window = create_main_window_widget(singleton_result["socket"])

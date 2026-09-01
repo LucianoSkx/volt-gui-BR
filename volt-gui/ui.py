@@ -21,6 +21,7 @@ from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
 from database import APP_VERSION
+from database import TAB_LABELS
 from database import find_cards_for_tab
 from themes import get_standard_button_height
 
@@ -96,7 +97,7 @@ def build_monospace_font() -> QFont:
 
 def process_copy_button_action(copy_button, clipboard_text: str) -> None:
     QApplication.clipboard().setText(clipboard_text)
-    copy_button.setText("Copied!")
+    copy_button.setText("Copiado!")
     effect = QGraphicsOpacityEffect(copy_button)
     copy_button.setGraphicsEffect(effect)
     animation = QPropertyAnimation(effect, b"opacity")
@@ -105,7 +106,7 @@ def process_copy_button_action(copy_button, clipboard_text: str) -> None:
     animation.setEndValue(1.0)
     animation.setEasingCurve(QEasingCurve.OutCubic)
     animation.start()
-    QTimer.singleShot(1000, lambda: copy_button.setText("Copy"))
+    QTimer.singleShot(1000, lambda: copy_button.setText("Copiar"))
     return None
 
 
@@ -132,7 +133,7 @@ def create_code_block_widget(code_text: str) -> QFrame:
     text_edit.setFont(build_monospace_font())
     text_edit.setFixedHeight(get_standard_button_height())
     text_edit.setStyleSheet("QTextEdit { background-color: #1e1e1e; color: #C0C0C0; border: none; border-left: 3px solid transparent; padding: 8px 12px; selection-background-color: #505050; border-radius: 6px; } QTextEdit:hover { border: none; border-left: 3px solid palette(highlight); border-radius: 6px; }")
-    copy_button = QPushButton("Copy")
+    copy_button = QPushButton("Copiar")
     copy_button.setCursor(QCursor(Qt.PointingHandCursor))
     copy_button.setFixedSize(get_copy_button_width(), get_standard_button_height())
     copy_button.setStyleSheet(build_copy_button_stylesheet(get_copy_button_width(), get_standard_button_height()))
@@ -268,7 +269,7 @@ def create_sidebar_tab_list(tab_names: tuple, stacked_widget) -> QListWidget:
     tab_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
     tab_list.setFocusPolicy(Qt.NoFocus)
     for tab_name in tab_names:
-        item = QListWidgetItem(tab_name)
+        item = QListWidgetItem(TAB_LABELS.get(tab_name, tab_name))
         item.setSizeHint(item.sizeHint().__class__(item.sizeHint().width(), 36))
         tab_list.addItem(item)
     tab_list.setCurrentRow(0)
