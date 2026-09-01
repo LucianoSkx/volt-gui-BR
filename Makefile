@@ -73,9 +73,9 @@ GUI_SOURCES  := $(wildcard volt-gui/*.py)
 VENV_STAMP   := $(OUT)/.venv
 
 DESKTOP_NAME     := volt-gui
-DESKTOP_COMMENT  := My AMD Adrenaline / NVIDIA Settings Linux Alternative
+DESKTOP_COMMENT  := Minha Alternativa ao AMD Adrenaline / NVIDIA Settings para Linux
 DESKTOP_CATEGORY := Utility;
-DESKTOP_KEYWORDS := vulkan;vsync;gpu;gaming;
+DESKTOP_KEYWORDS := vulkan;vsync;gpu;gaming;jogos;
 
 FLATPAK_RUNTIMES := 23.08 24.08 25.08
 FLATPAK_EXT_ID   := org.freedesktop.Platform.VulkanLayer.volt

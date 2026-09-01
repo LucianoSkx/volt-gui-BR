@@ -18,7 +18,8 @@ from probe import shading_options
 APP_VERSION: Final[str] = "2.1.1"
 APP_AUTHOR: Final[str] = "pythonlover02"
 APP_LICENSE: Final[str] = "GPL 3.0 License"
-APP_DESCRIPTION: Final[str] = "My AMD Adrenaline / NVIDIA Settings Linux Alternative"
+APP_DESCRIPTION: Final[str] = "Minha Alternativa ao AMD Adrenaline / NVIDIA Settings para Linux"
+APP_TRANSLATOR: Final[str] = "LucianoSkx (pt-BR)"
 
 DEFAULT_VALUE: Final[str] = "default"
 DEFAULT_PROFILE: Final[str] = "default"
@@ -26,141 +27,151 @@ DEFAULT_PROFILE: Final[str] = "default"
 PROFILE_TABS: Final[tuple] = ("GPU", "Display", "Textures", "Rendering", "Framerate")
 ALL_TABS: Final[tuple] = ("GPU", "Display", "Textures", "Rendering", "Framerate", "Options", "About")
 
+TAB_LABELS: Final[dict] = {
+    "GPU": "GPU",
+    "Display": "Tela",
+    "Textures": "Texturas",
+    "Rendering": "Renderização",
+    "Framerate": "Taxa de Quadros",
+    "Options": "Opções",
+    "About": "Sobre",
+}
+
 
 SETTINGS_DB: Final[dict] = {
     "GPU": {
         "device": {
             "section": "gpu",
-            "label": "Physical Device",
-            "description": "Which GPU the game sees. The layer hides every other device from enumeration, so a game that takes the first one it is offered gets yours. If nothing matches, the full list comes back and a warning is logged.",
+            "label": "Dispositivo Físico",
+            "description": "Qual GPU o jogo enxerga. A camada esconde todos os outros dispositivos da enumeração, então um jogo que pega o primeiro que lhe é oferecido recebe o seu. Se nada coincidir, a lista completa volta e um aviso é registrado.",
             "options": (DEFAULT_VALUE,),
         },
     },
     "Display": {
         "present_mode": {
             "section": "display",
-            "label": "VSync / Present Mode",
-            "description": "How finished frames reach the screen. immediate turns vsync off, mailbox is low latency vsync, fifo is classic vsync, fifo_relaxed tears only below refresh. Every other mode is hidden from the game, so its own vsync menu cannot offer one you ruled out. A mode the surface lacks falls back to the game's own choice with a warning.",
+            "label": "VSync / Modo de Apresentação",
+            "description": "Como os quadros finalizados chegam à tela. immediate desliga o vsync, mailbox é vsync de baixa latência, fifo é vsync clássico, fifo_relaxed rasga apenas abaixo da taxa de atualização. Todos os outros modos são escondidos do jogo, então seu próprio menu de vsync não pode oferecer um que você descartou. Um modo que a superfície não possui volta para a escolha do jogo com um aviso.",
             "options": (DEFAULT_VALUE,),
         },
         "image_count": {
             "section": "display",
-            "label": "Swapchain Images",
-            "description": "How many images the swapchain holds, which is the frames in flight control and the closest thing here to an anti-lag setting. More lets the game run further ahead of the GPU, smoothing frame delivery and costing input lag. Fewer holds it closer to the display. The list is what this surface allows.",
+            "label": "Imagens da Swapchain",
+            "description": "Quantas imagens a swapchain mantém, que é o controle de quadros em voo e o mais próximo de uma configuração anti-lag aqui. Mais permite que o jogo rode mais à frente da GPU, suavizando a entrega de quadros e custando latência de entrada. Menos o mantém mais próximo da tela. A lista é o que esta superfície permite.",
             "options": (DEFAULT_VALUE,),
         },
         "composite_alpha": {
             "section": "display",
-            "label": "Composite Alpha",
-            "description": "How the compositor treats the alpha channel of the finished image. opaque skips blending the window altogether, the cheapest path on Wayland. A value the surface turns down falls back to the game's own choice with a warning.",
+            "label": "Alpha Composto",
+            "description": "Como o compositor trata o canal alfa da imagem finalizada. opaque ignora a mesclagem da janela completamente, o caminho mais barato no Wayland. Um valor que a superfície recusa volta para a escolha do jogo com um aviso.",
             "options": (DEFAULT_VALUE,),
         },
         "clipped": {
             "section": "display",
-            "label": "Clipped Presentation",
-            "description": "Whether the driver may discard work on pixels another window covers. on is cheaper and is what almost every game asks for already. off keeps those pixels rendered, which only matters if something reads the presented image back. Core Vulkan, so the list never changes.",
+            "label": "Apresentação Recortada",
+            "description": "Se o driver pode descartar trabalho em pixels que outra janela cobre. ligado é mais barato e é o que quase todo jogo já pede. desligado mantém esses pixels renderizados, o que só importa se algo lê a imagem apresentada de volta. Vulkan base, então a lista nunca muda.",
             "options": (DEFAULT_VALUE, "off", "on"),
         },
     },
     "Framerate": {
         "frame_limit": {
             "section": "framerate",
-            "label": "Frame Limit",
-            "description": "Cap the frame rate at present time, shown with the frame budget each rate gives you. Past about 500 the interval is shorter than the kernel wakes reliably, so sleep pacing drifts above the cap and holding the rate needs sliced, precise or spin.",
+            "label": "Limite de Quadros",
+            "description": "Limita a taxa de quadros no momento da apresentação, mostrado com o orçamento de tempo que cada taxa oferece. Acima de ~500 o intervalo é menor do que o kernel acorda de forma confiável, então o ritmo sleep desvia acima do limite e manter a taxa exige sliced, precise ou spin.",
             "options": (DEFAULT_VALUE, "20", "24", "30", "36", "40", "45", "48", "50", "60", "72", "75", "90", "100", "120", "144", "165", "180", "240", "300", "360", "540", "600", "720", "900", "1000"),
         },
         "frame_limit_offset": {
             "section": "framerate",
-            "label": "Frame Limit Offset",
-            "description": "Shift the frame limit up or down, in steps of two. VRR displays want the cap sitting just under refresh: pick 144, set this to -6, and you land on 138. volt does not read your refresh rate and never shifts a cap by itself, since most displays are not VRR. Only does something when Frame Limit is set.",
+            "label": "Deslocamento do Limite",
+            "description": "Desloca o limite de quadros para cima ou para baixo, em passos de dois. Telas VRR querem o limite logo abaixo da taxa de atualização: escolha 144, defina como -6 e você cai em 138. O volt não lê sua taxa de atualização e nunca desloca um limite sozinho, já que a maioria das telas não é VRR. Só faz algo quando Limite de Quadros está definido.",
             "options": (DEFAULT_VALUE, "-10", "-8", "-6", "-4", "-2", "0", "2", "4", "6", "8", "10"),
         },
         "frame_limit_cadence": {
             "section": "framerate",
-            "label": "Frame Limit Cadence",
-            "description": "Which rate the limiter paces at. fixed uses your cap and nothing else. smooth paces at the slowest of the last few frames, so the fast frames wait for the slow ones and the cadence comes out even at whatever the machine is holding. dynamic reads the same and rounds it down to a quarter step of your cap, so it sits on a set rate: a 60 cap steps 60, 48, 40, 34, 30. Both trade frames for even spacing, and neither goes faster than your cap. Set fixed if the machine holds the cap, or if you want every frame you can get for the input latency. Only does something when Frame Limit is set.",
+            "label": "Cadência do Limite",
+            "description": "Em qual taxa o limitador ritma. fixed usa seu limite e nada mais. smooth ritma no mais lento dos últimos quadros, então os quadros rápidos esperam pelos lentos e a cadência sai uniforme no que a máquina está sustentando. dynamic lê o mesmo e arredonda para baixo até um quarto de passo do seu limite, então fica em uma taxa fixa: um limite de 60 passa por 60, 48, 40, 34, 30. Ambos trocam quadros por espaçamento uniforme, e nenhum vai mais rápido que seu limite. Use fixed se a máquina sustenta o limite, ou se quer cada quadro possível pela latência. Só faz algo quando Limite de Quadros está definido.",
             "options": (DEFAULT_VALUE, "fixed", "smooth", "dynamic"),
         },
         "frame_limit_method": {
             "section": "framerate",
-            "label": "Frame Limit Method",
-            "description": "When the limiter waits. early holds the frame back so presents leave on a fixed cadence. late lets the present through and waits before handing control back, so the game reads input closer to display time, which is what Reflex and Anti-Lag do. reactive waits where early does but measures from the frame just shown, so a slow frame is never chased with a fast one. Only does something when Frame Limit is set.",
+            "label": "Método do Limite",
+            "description": "Quando o limitador espera. early segura o quadro para que as apresentações saiam em cadência fixa. late deixa a apresentação passar e espera antes de devolver o controle, então o jogo lê a entrada mais perto do momento de exibição, que é o que Reflex e Anti-Lag fazem. reactive espera onde early espera mas mede a partir do quadro recém mostrado, então um quadro lento nunca é perseguido com um rápido. Só faz algo quando Limite de Quadros está definido.",
             "options": (DEFAULT_VALUE, "early", "late", "reactive"),
         },
         "frame_pacing": {
             "section": "framerate",
-            "label": "Frame Pacing",
-            "description": "How the limiter waits, cheapest to tightest. sleep hands the whole wait to the kernel. sliced sleeps in short steps and re-checks the clock, correcting for the kernel waking late. precise sleeps most of the interval then busy waits half a millisecond. spin busy waits throughout, the steadiest and the only one that keeps a core awake. Only does something when Frame Limit is set.",
+            "label": "Ritmo de Quadros",
+            "description": "Como o limitador espera, do mais barato ao mais preciso. sleep entrega toda a espera ao kernel. sliced dorme em passos curtos e re-verifica o relógio, corrigindo quando o kernel acorda atrasado. precise dorme a maior parte do intervalo e então espera ocupada por meio milissegundo. spin espera ocupada o tempo todo, o mais estável e o único que mantém um núcleo acordado. Só faz algo quando Limite de Quadros está definido.",
             "options": (DEFAULT_VALUE, "sleep", "sliced", "precise", "spin"),
         },
     },
     "Textures": {
         "mag_filter": {
             "section": "textures",
-            "label": "Magnification Filter",
-            "description": "How a texture is sampled when it is drawn larger than its own size, which is anything close to the camera. nearest gives sharp unfiltered pixels, linear smooths between them. This is the one filter a still screenshot shows you. Core Vulkan, so the list never changes.",
+            "label": "Filtro de Ampliação",
+            "description": "Como uma textura é amostrada quando desenhada maior que seu próprio tamanho, que é qualquer coisa perto da câmera. nearest dá pixels nítidos sem filtro, linear suaviza entre eles. Este é o único filtro que uma captura estática mostra. Vulkan base, então a lista nunca muda.",
             "options": (DEFAULT_VALUE, "nearest", "linear"),
         },
         "min_filter": {
             "section": "textures",
-            "label": "Minification Filter",
-            "description": "How a texture is sampled when it is drawn smaller than its own size, which is most of the screen. nearest takes one texel and shimmers as the camera moves. linear averages and settles, and is where mipmaps and anisotropic filtering do their work. Core Vulkan, so the list never changes.",
+            "label": "Filtro de Redução",
+            "description": "Como uma textura é amostrada quando desenhada menor que seu próprio tamanho, que é a maior parte da tela. nearest pega um texel e cintila quando a câmera se move. linear faz média e estabiliza, e é onde mipmaps e filtragem anisotrópica atuam. Vulkan base, então a lista nunca muda.",
             "options": (DEFAULT_VALUE, "nearest", "linear"),
         },
         "mipmap_mode": {
             "section": "textures",
-            "label": "Mipmap Mode",
-            "description": "How samplers move between mip levels. nearest cuts hard from one mip to the next, which shows as a band on the ground. linear blends across them, the third linear in trilinear. Core Vulkan, so the list never changes. Only affects textures that have mips.",
+            "label": "Modo Mipmap",
+            "description": "Como amostradores se movem entre níveis de mip. nearest corta abruptamente de um mip para o próximo, o que aparece como faixa no chão. linear mistura entre eles, o terceiro linear do trilinear. Vulkan base, então a lista nunca muda. Só afeta texturas que têm mips.",
             "options": (DEFAULT_VALUE, "nearest", "linear"),
         },
         "anisotropy": {
             "section": "textures",
-            "label": "Anisotropic Filtering",
-            "description": "Sharpen textures viewed at steep angles. Higher values look better at a small cost. The list runs in steps of two up to what your GPU reports. volt never enables the feature: where the game left it off the setting is ignored and a line is logged. Nearly every game asks for it.",
+            "label": "Filtragem Anisotrópica",
+            "description": "Nitidez em texturas vistas em ângulos acentuados. Valores maiores ficam melhores com pequeno custo. A lista vai em passos de dois até o que sua GPU reporta. O volt nunca ativa o recurso: onde o jogo deixou desligado a configuração é ignorada e uma linha é registrada. Quase todo jogo pede por ele.",
             "options": (DEFAULT_VALUE,),
         },
         "lod_bias": {
             "section": "textures",
-            "label": "LOD Bias",
-            "description": "Shift mipmap selection. Negative sharpens at the cost of shimmer, positive blurs but renders faster. A negative bias is the nearest volt gets to sharpening. The list runs in steps of 0.2 across the range your GPU reports.",
+            "label": "Viés LOD",
+            "description": "Desloca a seleção de mipmap. Negativo nitida ao custo de cintilação, positivo borra mas renderiza mais rápido. Um viés negativo é o mais próximo que o volt chega de nitidez. A lista vai em passos de 0.2 no intervalo que sua GPU reporta.",
             "options": (DEFAULT_VALUE,),
         },
         "mip_floor": {
             "section": "textures",
-            "label": "Mip Floor",
-            "description": "The lowest mip level samplers may use, called minimum LOD in Vulkan. Raising it forces smaller mips everywhere, trading detail for speed. The list runs in steps of two up to the largest image your GPU can address, and a level past the last mip a texture has simply lands on that last mip.",
+            "label": "Piso Mip",
+            "description": "O nível de mip mais baixo que amostradores podem usar, chamado LOD mínimo no Vulkan. Aumentar força mips menores por toda parte, trocando detalhe por velocidade. A lista vai em passos de dois até a maior imagem que sua GPU endereça, e um nível além do último mip simplesmente cai naquele último.",
             "options": (DEFAULT_VALUE,),
         },
         "mip_ceiling": {
             "section": "textures",
-            "label": "Mip Ceiling",
-            "description": "The highest mip level samplers may use, called maximum LOD in Vulkan. Lowering it keeps distant textures sharper than the game intended. The list matches Mip Floor, and a ceiling that lands below the floor is swapped with it rather than dropped.",
+            "label": "Teto Mip",
+            "description": "O nível de mip mais alto que amostradores podem usar, chamado LOD máximo no Vulkan. Diminuir mantém texturas distantes mais nítidas do que o jogo pretendia. A lista coincide com Piso Mip, e um teto abaixo do piso é trocado com ele em vez de descartado.",
             "options": (DEFAULT_VALUE,),
         },
     },
     "Rendering": {
         "sample_shading": {
             "section": "rendering",
-            "label": "Sample Shading",
-            "description": "Shade at sample rate inside MSAA render targets to reduce shimmer. The value is the smallest fraction of samples shaded, and off counts as zero. volt never enables the feature: most modern renderers are deferred and never ask, and where the game left it off the setting is ignored and a line is logged.",
+            "label": "Sombreamento por Amostra",
+            "description": "Sombreia na taxa de amostra dentro de alvos MSAA para reduzir cintilação. O valor é a menor fração de amostras sombreadas, e desligado conta como zero. O volt nunca ativa o recurso: a maioria dos renderizadores modernos é diferida e nunca pede, e onde o jogo deixou desligado a configuração é ignorada e uma linha é registrada.",
             "options": (DEFAULT_VALUE,),
         },
         "alpha_to_coverage": {
             "section": "rendering",
-            "label": "Alpha To Coverage",
-            "description": "Turn fragment alpha into coverage, which softens cutout edges on foliage and fences. Core Vulkan, so the list never changes. Only does something where the game already renders to an MSAA target.",
+            "label": "Alfa para Cobertura",
+            "description": "Transforma alfa de fragmento em cobertura, o que suaviza bordas recortadas em folhagem e cercas. Vulkan base, então a lista nunca muda. Só faz algo onde o jogo já renderiza em alvo MSAA.",
             "options": (DEFAULT_VALUE, "on", "off"),
         },
         "alpha_to_one": {
             "section": "rendering",
-            "label": "Alpha To One",
-            "description": "Force fragment alpha to 1 after the shader runs. volt never enables the feature: where the game left it off the setting is ignored and a line is logged. Only does something where the game already renders to an MSAA target.",
+            "label": "Alfa para Um",
+            "description": "Força o alfa do fragmento para 1 após o shader executar. O volt nunca ativa o recurso: onde o jogo deixou desligado a configuração é ignorada e uma linha é registrada. Só faz algo onde o jogo já renderiza em alvo MSAA.",
             "options": (DEFAULT_VALUE,),
         },
         "depth_clamp": {
             "section": "rendering",
-            "label": "Depth Clamp",
-            "description": "Keep fragments outside the near and far planes and pin their depth to the plane instead of discarding them. Stops weapon models being sliced open when the camera backs into a wall. The same toggle covers the far plane, where distant geometry flattens onto it instead of disappearing, which can look worse, so try it per game. volt never enables the feature, and most games leave it off, so expect this to do nothing in most of them. Run with VOLT_LOG=info to see which case you are in.",
+            "label": "Limite de Profundidade",
+            "description": "Mantém fragmentos fora dos planos próximo e distante e prende sua profundidade no plano em vez de descartá-los. Evita que modelos de armas sejam fatiados quando a câmera encosta na parede. O mesmo controle cobre o plano distante, onde geometria distante achata nele em vez de desaparecer, o que pode ficar pior, então teste por jogo. O volt nunca ativa o recurso, e a maioria dos jogos deixa desligado, então espere que não faça nada na maioria. Execute com VOLT_LOG=info para ver em qual caso você está.",
             "options": (DEFAULT_VALUE,),
         },
     },
@@ -168,44 +179,44 @@ SETTINGS_DB: Final[dict] = {
 
 OPTIONS_DB: Final[dict] = {
     "application_theme": {
-        "label": "Application Theme",
-        "description": "Color theme for the application. default is cachyos. Takes effect on program restart.",
+        "label": "Tema do Aplicativo",
+        "description": "Tema de cores do aplicativo. padrão é cachyos. Tem efeito após reiniciar o programa.",
         "options": (DEFAULT_VALUE, "cachyos", "amd", "intel", "nvidia"),
         "fallback": "cachyos",
     },
     "window_transparency": {
-        "label": "Window Transparency",
-        "description": "Window background transparency. default is off. Takes effect on program restart.",
+        "label": "Transparência da Janela",
+        "description": "Transparência do fundo da janela. padrão é desligado. Tem efeito após reiniciar o programa.",
         "options": (DEFAULT_VALUE, "on", "off"),
         "fallback": "off",
     },
     "interface_scale_factor": {
-        "label": "Interface Scale Factor",
-        "description": "UI scaling multiplier, in steps of 0.2. default is 1.0. Takes effect on program restart.",
+        "label": "Fator de Escala da Interface",
+        "description": "Multiplicador de escala da interface, em passos de 0.2. padrão é 1.0. Tem efeito após reiniciar o programa.",
         "options": (DEFAULT_VALUE, "0.6", "0.8", "1.0", "1.2", "1.4", "1.6", "1.8", "2.0", "2.2", "2.4", "2.6", "2.8", "3.0"),
         "fallback": "1.0",
     },
     "start_window_maximized": {
-        "label": "Start Window Maximized",
-        "description": "Start the window in maximized state. default is off. Takes effect on program restart.",
+        "label": "Iniciar Maximizado",
+        "description": "Inicia a janela maximizada. padrão é desligado. Tem efeito após reiniciar o programa.",
         "options": (DEFAULT_VALUE, "on", "off"),
         "fallback": "off",
     },
     "start_window_minimized": {
-        "label": "Start Window Minimized",
-        "description": "Start the window minimized to tray. default is off. Takes effect on program restart.",
+        "label": "Iniciar Minimizado",
+        "description": "Inicia a janela minimizada na bandeja. padrão é desligado. Tem efeito após reiniciar o programa.",
         "options": (DEFAULT_VALUE, "on", "off"),
         "fallback": "off",
     },
     "system_tray_behavior": {
-        "label": "System Tray",
-        "description": "Show icon in the system tray. default is off. Takes effect on program restart.",
+        "label": "Bandeja do Sistema",
+        "description": "Mostrar ícone na bandeja do sistema. padrão é desligado. Tem efeito após reiniciar o programa.",
         "options": (DEFAULT_VALUE, "on", "off"),
         "fallback": "off",
     },
     "welcome_message_display": {
-        "label": "Welcome Message",
-        "description": "Show the welcome message on startup. default is on. Takes effect on program restart.",
+        "label": "Mensagem de Boas-vindas",
+        "description": "Mostrar a mensagem de boas-vindas ao iniciar. padrão é ligado. Tem efeito após reiniciar o programa.",
         "options": (DEFAULT_VALUE, "on", "off"),
         "fallback": "on",
     },
@@ -345,8 +356,9 @@ def get_accent_colors(theme_name: str) -> tuple:
 
 def get_about_data() -> dict:
     return {
-        "Description": APP_DESCRIPTION,
-        "License": APP_LICENSE,
-        "Author": APP_AUTHOR,
-        "Version": APP_VERSION,
+        "Descrição": APP_DESCRIPTION,
+        "Licença": APP_LICENSE,
+        "Autor": APP_AUTHOR,
+        "Tradutor pt-BR": APP_TRANSLATOR,
+        "Versão": APP_VERSION,
     }

@@ -6,11 +6,11 @@ from profiles import process_profile_widgets_block_signals
 from profiles import process_profile_widgets_reset
 from profiles import process_widget_value_update
 
-PRESET_PLACEHOLDER: Final[str] = "Presets"
+PRESET_PLACEHOLDER: Final[str] = "Predefinições"
 
 PRESET_OVERRIDES: Final[dict] = {
-    "Default": {},
-    "Quality": {
+    "Padrão": {},
+    "Qualidade": {
         "Display:present_mode": "fifo",
         "Display:image_count": "4",
         "Framerate:frame_limit_method": "early",
@@ -23,7 +23,7 @@ PRESET_OVERRIDES: Final[dict] = {
         "Textures:mip_floor": "0",
         "Rendering:alpha_to_coverage": "on",
     },
-    "Balanced": {
+    "Equilibrado": {
         "Display:present_mode": "mailbox",
         "Framerate:frame_limit_method": "early",
         "Framerate:frame_pacing": "sliced",
@@ -33,7 +33,7 @@ PRESET_OVERRIDES: Final[dict] = {
         "Textures:anisotropy": "8",
         "Textures:mip_floor": "0",
     },
-    "Performance FPS": {
+    "Desempenho FPS": {
         "Display:present_mode": "mailbox",
         "Display:image_count": "4",
         "Framerate:frame_limit_method": "early",
@@ -44,7 +44,7 @@ PRESET_OVERRIDES: Final[dict] = {
         "Textures:anisotropy": "4",
         "Textures:lod_bias": "0.6",
     },
-    "Performance Low Latency": {
+    "Desempenho Baixa Latência": {
         "Display:present_mode": "immediate",
         "Display:image_count": "2",
         "Framerate:frame_limit_method": "late",
@@ -55,7 +55,7 @@ PRESET_OVERRIDES: Final[dict] = {
         "Textures:anisotropy": "4",
         "Textures:lod_bias": "0.6",
     },
-    "Potato FPS": {
+    "Batata FPS": {
         "Display:present_mode": "mailbox",
         "Display:image_count": "4",
         "Framerate:frame_limit_method": "early",
@@ -68,7 +68,7 @@ PRESET_OVERRIDES: Final[dict] = {
         "Textures:mip_floor": "2",
         "Rendering:alpha_to_coverage": "off",
     },
-    "Potato Low Latency": {
+    "Batata Baixa Latência": {
         "Display:present_mode": "immediate",
         "Display:image_count": "2",
         "Framerate:frame_limit_method": "late",
