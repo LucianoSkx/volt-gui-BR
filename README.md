@@ -1,17 +1,17 @@
 > [!NOTE]
-> Bug reports and pull requests are welcome, but please understand that development happens in my free time and progress may be slow at times. The project is still maintained even if the last commit was made a while ago.
+> Relatos de bugs e pull requests são bem-vindos, mas entenda que o desenvolvimento acontece no meu tempo livre e o progresso pode ser lento às vezes. O projeto continua mantido mesmo que o último commit tenha sido há um tempo.
 
 # volt-gui
 
-Control panel for Vulkan games on Linux. Settings are applied by **volt**, an implicit Vulkan layer written in Rust, so they work on every driver: RADV, ANV, NVK, AMDVLK, NVIDIA proprietary.
+Painel de controle para jogos Vulkan no Linux. As configurações são aplicadas pelo **volt**, uma camada Vulkan implícita escrita em Rust, então funciona em todo driver: RADV, ANV, NVK, AMDVLK, NVIDIA proprietário.
 
-Vulkan 1.0 only. The layer requests nothing beyond `VK_KHR_swapchain`, so behaviour never splits between drivers.
+Apenas Vulkan 1.0. A camada não pede nada além de `VK_KHR_swapchain`, então o comportamento nunca se divide entre drivers.
 
 ![](/images/1.png)
 ![](/images/2.png)
 ![](/images/3.png)
 
-## Quick Start
+## Início Rápido
 
 ```
 git clone https://github.com/pythonlover02/volt-gui.git
@@ -19,247 +19,247 @@ cd volt-gui
 make
 make install-user
 
-volt-gui          # set what you want, press Apply
-volt -- ./game
+volt-gui          # configure o que quiser, pressione Aplicar
+volt -- ./jogo
 ```
 
-That covers native, Steam, Wine and Proton. For a system-wide install use `sudo make install` instead. Pick one, never both.
+Isso cobre nativo, Steam, Wine e Proton. Para instalação em todo o sistema use `sudo make install`. Escolha um, nunca ambos.
 
-Steam launch options:
+Opções de inicialização da Steam:
 
 ```
 volt -- %command%
 ```
 
-Flatpak games need some extra work, see [Flatpak](#flatpak).
+Jogos Flatpak precisam de trabalho extra, veja [Flatpak](#flatpak).
 
-## Table of Contents
+## Índice
 
-- [Settings](#settings)
-- [How It Works](#how-it-works)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Install paths](#install-paths)
-- [Uninstalling](#uninstalling)
-- [Immutable Systems](#immutable-systems)
+- [Configurações](#configurações)
+- [Como Funciona](#como-funciona)
+- [Requisitos](#requisitos)
+- [Instalação](#instalação)
+- [Caminhos de instalação](#caminhos-de-instalação)
+- [Desinstalando](#desinstalando)
+- [Sistemas Imutáveis](#sistemas-imutáveis)
 - [FEX-Emu / Box64](#fex-emu--box64)
-- [Building Releases](#building-releases)
-- [Usage](#usage)
-- [Environment Variables](#environment-variables)
-- [Files](#files)
+- [Compilando Releases](#compilando-releases)
+- [Uso](#uso)
+- [Variáveis de Ambiente](#variáveis-de-ambiente)
+- [Arquivos](#arquivos)
 - [Flatpak](#flatpak)
-- [Profiles, Presets & Options](#profiles-presets--options)
-- [What volt will never do](#what-volt-will-never-do)
-- [Contributing](#contributing)
+- [Perfis, Predefinições e Opções](#perfis-predefinições--opções)
+- [O que o volt nunca fará](#o-que-o-volt-nunca-fará)
+- [Contribuindo](#contribuindo)
 
-## Settings
+## Configurações
 
-21 settings across 5 tabs. Every one defaults to `default`, which leaves the game's own choice alone. A profile with everything on default does nothing.
+21 configurações em 5 abas. Cada uma tem padrão `default` (padrão), que deixa a escolha do jogo intacta. Um perfil com tudo em padrão não faz nada.
 
-Each setting is a single value. No ranges, no ordering, nothing to get backwards.
+Cada configuração é um único valor. Sem intervalos, sem ordenação, nada para confundir.
 
-| Tab | Section | Count | Covers |
+| Aba | Seção | Qtd | Cobre |
 |-----|---------|------:|--------|
-| GPU | `[gpu]` | 1 | which device the game sees |
-| Display | `[display]` | 4 | present mode, image count, compositing, clipping |
-| Textures | `[textures]` | 7 | filtering, mips, anisotropy, LOD |
-| Rendering | `[rendering]` | 4 | sample shading, alpha to coverage, alpha to one, depth clamp |
-| Framerate | `[framerate]` | 5 | limit, offset, cadence, method, pacing |
+| GPU | `[gpu]` | 1 | qual dispositivo o jogo enxerga |
+| Tela | `[display]` | 4 | modo de apresentação, contagem de imagens, composição, recorte |
+| Texturas | `[textures]` | 7 | filtragem, mips, anisotropia, LOD |
+| Renderização | `[rendering]` | 4 | sample shading, alpha to coverage, alpha to one, depth clamp |
+| Taxa de Quadros | `[framerate]` | 5 | limite, deslocamento, cadência, método, ritmo |
 
-Most option lists are read from your hardware, not from a table in volt-gui. Present modes, image counts, alpha modes, GPU names, anisotropy, mip levels and LOD bias all come from a probe of your own device. A setting your hardware lacks holds only `default`.
+A maioria das listas de opções é lida do seu hardware, não de uma tabela no volt-gui. Modos de apresentação, contagens de imagem, modos alfa, nomes de GPU, anisotropia, níveis de mip e viés LOD vêm de uma sondagem do seu próprio dispositivo. Uma configuração que seu hardware não possui contém apenas `padrão`.
 
-Fixed lists exist where there is nothing to read. `nearest` and `linear` are core Vulkan with no query behind them. The Framerate settings have nothing to read either, since a game never tells Vulkan what frame rate it wants.
+Listas fixas existem onde não há nada para ler. `nearest` e `linear` são Vulkan base sem consulta por trás. As configurações de Taxa de Quadros também não têm nada para ler, já que um jogo nunca diz ao Vulkan qual taxa de quadros quer.
 
-Settings are read once at game start. Press Apply, then restart the game.
+As configurações são lidas uma vez ao iniciar o jogo. Pressione Aplicar e reinicie o jogo.
 
-### The probe
+### A sondagem
 
-volt-gui runs `volt-probe` under the profile you are editing. It opens a 1px window that is never mapped, creates a surface, swapchain and sampler, records what the device reported, and exits. Nothing appears on screen.
+O volt-gui executa `volt-probe` sob o perfil que você está editando. Ele abre uma janela de 1px que nunca é mapeada, cria uma superfície, swapchain e amostrador, registra o que o dispositivo reportou e sai. Nada aparece na tela.
 
 ```
-volt --probe myprofile -- volt-probe
+volt --probe meuperfil -- volt-probe
 ```
 
-It uses X11, which every desktop has through XWayland. Games may open Wayland or gamescope surfaces instead, and the profile is written before volt knows which. This only affects present modes, image counts and alpha modes, and the lists mostly agree. Where they don't, the layer handles it at runtime: image count is clamped against the real surface, and a rejected present or alpha mode leaves the game's value with a warning.
+Usa X11, que todo desktop tem via XWayland. Jogos podem abrir superfícies Wayland ou gamescope, e o perfil é gravado antes do volt saber qual. Isso só afeta modos de apresentação, contagens de imagem e modos alfa, e as listas na maioria concordam. Onde não, a camada lida em tempo de execução: contagem de imagens é limitada contra a superfície real, e um modo de apresentação ou alfa rejeitado mantém o valor do jogo com um aviso.
 
 ### GPU
 
-**Physical Device** pick which GPU the game sees. volt hides the rest during enumeration. If nothing matches, the full list comes back with a warning.
+**Dispositivo Físico** escolhe qual GPU o jogo enxerga. O volt esconde o resto durante a enumeração. Se nada coincidir, a lista completa volta com um aviso.
 
-This is the only setting volt cannot force. Nothing in Vulkan names the device a swapchain runs on, so a game that ignores enumeration order keeps what it picked.
+Esta é a única configuração que o volt não pode forçar. Nada no Vulkan nomeia o dispositivo em que uma swapchain roda, então um jogo que ignora a ordem de enumeração mantém o que escolheu.
 
-### Display
+### Tela
 
-**VSync / Present Mode** `immediate` off, `mailbox` low-latency vsync, `fifo` classic vsync, `fifo_relaxed` tears below refresh. Modes you ruled out are hidden from the game, so its own vsync menu can't offer them.
+**VSync / Modo de Apresentação** `immediate` desligado, `mailbox` vsync de baixa latência, `fifo` vsync clássico, `fifo_relaxed` rasga abaixo da atualização. Modos que você descartou são escondidos do jogo, então seu próprio menu de vsync não pode oferecê-los.
 
-**Swapchain Images** frames in flight. More lets the game run ahead of the GPU, smoothing delivery at the cost of input lag. Fewer holds it closer to the display. This is the anti-lag setting.
+**Imagens da Swapchain** quadros em voo. Mais deixa o jogo rodar à frente da GPU, suavizando a entrega ao custo de latência de entrada. Menos o mantém mais perto da tela. Esta é a configuração anti-lag.
 
-**Composite Alpha** how the compositor treats the finished image's alpha. `opaque` skips compositor blending on Wayland.
+**Alfa Composto** como o compositor trata o alfa da imagem finalizada. `opaque` pula a mesclagem do compositor no Wayland.
 
-**Clipped Presentation** whether the driver may skip pixels another window covers.
+**Apresentação Recortada** se o driver pode pular pixels que outra janela cobre.
 
-### Textures
+### Texturas
 
-**Magnification Filter** sampling where a texture is drawn larger than its own size, so anything close to the camera. `nearest` is sharp pixels, `linear` smooths. The one filter a screenshot shows you.
+**Filtro de Ampliação** amostragem onde a textura é desenhada maior que seu próprio tamanho, ou seja, qualquer coisa perto da câmera. `nearest` são pixels nítidos, `linear` suaviza. O único filtro que uma captura de tela mostra.
 
-**Minification Filter** the same where it's drawn smaller, which is most of the screen. `nearest` shimmers as the camera moves, `linear` settles. Leave on `linear` unless you want the crawl.
+**Filtro de Redução** o mesmo onde é desenhado menor, que é a maior parte da tela. `nearest` cintila quando a câmera se move, `linear` estabiliza. Deixe em `linear` a menos que queira cintilação.
 
-**Mipmap Mode** hard cut between mip levels, or a blend.
+**Modo Mipmap** corte seco entre níveis de mip, ou mistura.
 
-Three sampler fields, three settings, so every combination is reachable. Retro is `nearest`/`nearest`/`nearest`. Bilinear is `linear`/`linear`/`nearest`. Trilinear is `linear`/`linear`/`linear`. Sharp pixel art without distant shimmer is `nearest`/`linear`/`linear`, which no named mode ever offered.
+Três campos de amostrador, três configurações, então toda combinação é alcançável. Retrô é `nearest`/`nearest`/`nearest`. Bilinear é `linear`/`linear`/`nearest`. Trilinear é `linear`/`linear`/`linear`. Pixel art nítido sem cintilação distante é `nearest`/`linear`/`linear`, que nenhum modo nomeado ofereceu.
 
-**Anisotropic Filtering** off up to whatever your GPU reports. volt never enables `samplerAnisotropy`; where the game left it off the setting is ignored and logged. Nearly every game enables it.
+**Filtragem Anisotrópica** de desligado até o que sua GPU reporta. O volt nunca habilita `samplerAnisotropy`; onde o jogo deixou desligado a configuração é ignorada e registrada. Quase todo jogo habilita.
 
-**LOD Bias** shift mipmap selection sharper or blurrier.
+**Viés LOD** desloca a seleção de mipmap para mais nítido ou mais borrado.
 
-**Mip Floor / Mip Ceiling** lowest and highest mip levels samplers may use. A ceiling below the floor is swapped rather than dropped.
+**Piso Mip / Teto Mip** níveis de mip mais baixo e mais alto que amostradores podem usar. Um teto abaixo do piso é trocado em vez de descartado.
 
-### Rendering
+### Renderização
 
-**Sample Shading** shade at sample rate inside MSAA targets to cut shimmer. volt never enables `sampleRateShading`; most deferred renderers never ask for it.
+**Sombreamento por Amostra** sombreia na taxa de amostra dentro de alvos MSAA para reduzir cintilação. O volt nunca habilita `sampleRateShading`; a maioria dos renderizadores diferidos nunca pede.
 
-**Alpha To Coverage** turns fragment alpha into coverage. Softens cutout edges on foliage and fences. Only does something where the game already renders to MSAA.
+**Alfa para Cobertura** transforma alfa de fragmento em cobertura. Suaviza bordas recortadas em folhagem e cercas. Só faz algo onde o jogo já renderiza em MSAA.
 
-**Alpha To One** force fragment alpha to 1 after the shader. volt never enables the feature.
+**Alfa para Um** força alfa do fragmento para 1 após o shader. O volt nunca habilita o recurso.
 
-**Depth Clamp** keep fragments outside the near and far planes and pin their depth instead of discarding them. Stops weapon models being sliced open against walls. Same toggle covers the far plane, where geometry flattens onto it instead of vanishing, so test per game. Most games never enable `depthClamp` and volt won't enable it for them, so this usually does nothing and says so in the log.
+**Limite de Profundidade** mantém fragmentos fora dos planos próximo e distante e prende sua profundidade em vez de descartá-los. Evita que modelos de armas sejam fatiados contra paredes. O mesmo controle cobre o plano distante, onde a geometria achata nele em vez de sumir, então teste por jogo. A maioria dos jogos nunca habilita `depthClamp` e o volt não habilitará por eles, então geralmente não faz nada.
 
-### Framerate
+### Taxa de Quadros
 
-Most limiters give you a cap and a method. volt gives you five settings. Nothing else on Linux covers all five.
+A maioria dos limitadores oferece um limite e um método. O volt oferece cinco configurações. Nada mais no Linux cobre todas as cinco.
 
-**Frame Limit** cap at present time. Deadlines follow a fixed timeline rather than the last present, so scheduler jitter doesn't drift you below the rate you asked for. Kept per swapchain.
+**Limite de Quadros** limite no momento da apresentação. Prazos seguem uma linha do tempo fixa em vez da última apresentação, então jitter do agendador não te arrasta abaixo da taxa pedida. Mantido por swapchain.
 
-**Frame Limit Offset** shift the cap by -10 to 10 in steps of two. VRR displays want the cap just under refresh: pick 144, set -6, land on 138. volt never shifts a cap on its own since most displays aren't VRR.
+**Deslocamento do Limite** desloca o limite em -10 a 10 em passos de dois. Telas VRR querem o limite logo abaixo da atualização: escolha 144, defina -6, caia em 138. O volt nunca desloca um limite sozinho já que a maioria das telas não é VRR.
 
-**Frame Limit Cadence** which rate the limiter paces at.
+**Cadência do Limite** em qual taxa o limitador ritma.
 
-- `fixed` is your cap and nothing else.
-- `smooth` paces at the slowest of the last few frames, so fast frames wait for slow ones and the cadence comes out even at whatever the machine holds.
-- `dynamic` reads the same and rounds down to a quarter step of the cap. A 60 cap steps 60, 48, 40, 34, 30. A 240 cap steps 240, 192, 160, 137, 120.
+- `fixed` é seu limite e nada mais.
+- `smooth` ritma no mais lento dos últimos quadros, então quadros rápidos esperam pelos lentos e a cadência sai uniforme no que a máquina sustenta.
+- `dynamic` lê o mesmo e arredonda para baixo até um quarto de passo do limite. Um limite de 60 passa por 60, 48, 40, 34, 30. Um limite de 240 passa por 240, 192, 160, 137, 120.
 
-Both take the idea from consoles: pick a rate the machine can hold and stay on it. Neither reads the average, because a limiter can only make frames later and a frame slower than the average could never be paced up to it. Both climb back on their own and neither exceeds your cap.
+Ambos vêm da ideia de consoles: escolher uma taxa que a máquina sustenta e ficar nela. Nenhum lê a média, porque um limitador só pode atrasar quadros e um quadro mais lento que a média nunca poderia ser ritmado para cima até ela. Ambos sobem sozinhos e nenhum excede seu limite.
 
-You're trading frames for evenness. `fixed` does nothing once the machine falls under the cap, so you get whatever it produced, one frame long and the next short. A rate sitting on one of `dynamic`'s steps can bounce between two, which is what rounding costs; `smooth` is the same reading without it. Use `fixed` if the machine holds the cap, or if you want every frame you can get.
+Você troca quadros por uniformidade. `fixed` não faz nada quando a máquina cai abaixo do limite, então você recebe o que ela produziu, um quadro longo e o próximo curto. Uma taxa em um dos passos de `dynamic` pode quicar entre dois, que é o custo do arredondamento; `smooth` é a mesma leitura sem ele. Use `fixed` se a máquina sustenta o limite, ou se quer cada quadro possível.
 
-**Frame Limit Method** `early` holds the frame back so presents leave on a fixed cadence. `late` lets the present through and waits after, so the game samples input closer to display time. This is the equivalent of Reflex and Anti-Lag. `reactive` waits where early does but measures from the frame just shown, so a slow frame is never chased with a fast one.
+**Método do Limite** `early` segura o quadro para que apresentações saiam em cadência fixa. `late` deixa a apresentação passar e espera depois, então o jogo amostra entrada mais perto do tempo de exibição. Este é o equivalente a Reflex e Anti-Lag. `reactive` espera onde early espera mas mede a partir do quadro recém mostrado, então um quadro lento nunca é perseguido com um rápido.
 
-**Frame Pacing** how the limiter kills time. `sleep` hands the wait to the kernel. `sliced` sleeps in short steps and rechecks. `precise` sleeps most of it then busy waits half a millisecond. `spin` busy waits throughout, steadiest and the only one that keeps a core awake.
+**Ritmo de Quadros** como o limitador mata tempo. `sleep` entrega a espera ao kernel. `sliced` dorme em passos curtos e re-verifica. `precise` dorme a maior parte e então espera ocupada por meio milissegundo. `spin` espera ocupada o tempo todo, mais estável e o único que mantém um núcleo acordado.
 
-## How It Works
+## Como Funciona
 
-volt registers as an implicit layer (`VK_LAYER_VOLT_settings`). The manifest declares `enable_environment = VOLT_ENABLE`, so the loader always finds it but only activates it when the `volt` launcher sets that variable on the child process.
+O volt se registra como camada implícita (`VK_LAYER_VOLT_settings`). O manifesto declara `enable_environment = VOLT_ENABLE`, então o loader sempre o encontra mas só o ativa quando o lançador `volt` define essa variável no processo filho.
 
-The layer reads `~/.config/volt-gui/<profile>.toml` once at startup and rewrites the calls the game makes:
+A camada lê `~/.config/volt-gui/<perfil>.toml` uma vez na inicialização e reescreve as chamadas que o jogo faz:
 
-| Tab | Where the layer acts |
+| Aba | Onde a camada atua |
 |-----|----------------------|
 | GPU | `vkEnumeratePhysicalDevices`, `vkEnumeratePhysicalDeviceGroups(KHR)` |
-| Display | `vkGetPhysicalDeviceSurfacePresentModesKHR`, `...PresentModes2EXT`, `...SurfaceCapabilities(2)KHR`, `vkCreateSwapchainKHR`, `vkCreateSharedSwapchainsKHR` |
-| Textures | `vkCreateSampler`, `vkWriteSamplerDescriptorsEXT` |
-| Rendering | `vkCreateGraphicsPipelines`, `vkCmdSetAlphaToCoverageEnableEXT`, `vkCmdSetAlphaToOneEnableEXT`, `vkCmdSetDepthClampEnableEXT` |
-| Framerate | `vkQueuePresentKHR` |
+| Tela | `vkGetPhysicalDeviceSurfacePresentModesKHR`, `...PresentModes2EXT`, `...SurfaceCapabilities(2)KHR`, `vkCreateSwapchainKHR`, `vkCreateSharedSwapchainsKHR` |
+| Texturas | `vkCreateSampler`, `vkWriteSamplerDescriptorsEXT` |
+| Renderização | `vkCreateGraphicsPipelines`, `vkCmdSetAlphaToCoverageEnableEXT`, `vkCmdSetAlphaToOneEnableEXT`, `vkCmdSetDepthClampEnableEXT` |
+| Taxa de Quadros | `vkQueuePresentKHR` |
 
-Device creation is read, never modified. volt learns which features the game enabled so feature-gated settings apply only where the game asked, and enables nothing itself.
+A criação de dispositivo é lida, nunca modificada. O volt aprende quais recursos o jogo habilitou para que configurações com recurso só se apliquem onde o jogo pediu, e não habilita nada por conta própria.
 
-Every setting is hooked on each path that reaches it. `2`/`EXT` query variants, device groups, shared swapchains, inline sampler writes and dynamic alpha-to-coverage get the same treatment as the core calls. Present mode lists carried in a `pNext` chain are filtered in place too.
+Cada configuração é interceptada em cada caminho que a alcança. Variantes `2`/`EXT`, grupos de dispositivos, swapchains compartilhadas, escritas de amostrador inline e cobertura alfa dinâmica recebem o mesmo tratamento. Listas de modo de apresentação em cadeia `pNext` também são filtradas no local.
 
-An entry point for an extension the game never enabled is unreachable, and the layer only returns a hook when the call resolves further down the chain.
+Um ponto de entrada para uma extensão que o jogo nunca habilitou é inalcançável, e a camada só retorna um gancho quando a chamada resolve mais abaixo na cadeia.
 
-volt-gui is the PySide6 front end. Apply just saves the profile. No elevated permissions, no scripts.
+O volt-gui é o front-end PySide6. Aplicar apenas salva o perfil. Sem permissões elevadas, sem scripts.
 
-## Requirements
+## Requisitos
 
-| Component | Requirement |
+| Componente | Requisito |
 |-----------|-------------|
-| Layer | Vulkan 1.0+ with `VK_KHR_swapchain`, Linux x86_64 (plus i686 for 32-bit games) |
-| Build | Rust 1.85.1+ with rustup, GNU make 4.3+ |
-| 32-bit layer | `gcc-multilib`, `libc6-dev-i386` |
+| Camada | Vulkan 1.0+ com `VK_KHR_swapchain`, Linux x86_64 (mais i686 para jogos 32-bit) |
+| Compilação | Rust 1.85.1+ com rustup, GNU make 4.3+ |
+| Camada 32-bit | `gcc-multilib`, `libc6-dev-i386` |
 | GUI | Python 3.10+, PySide6 |
-| Flatpak bundles | `flatpak`, `ostree` |
-| Container release | `podman` or `docker` |
-| Probe build | `libxcb` headers |
+| Bundles Flatpak | `flatpak`, `ostree` |
+| Release em contêiner | `podman` ou `docker` |
+| Compilação da sondagem | cabeçalhos `libxcb` |
 
-No native aarch64 build. See [FEX-Emu / Box64](#fex-emu--box64).
+Sem compilação nativa aarch64. Veja [FEX-Emu / Box64](#fex-emu--box64).
 
-## Installation
+## Instalação
 
 ### Arch Linux (AUR)
 
-There's an unofficial [volt-gui](https://aur.archlinux.org/packages/volt-gui) package. I don't maintain it, but the packager has been good to deal with, so I won't steer you away.
+Existe um pacote não oficial [volt-gui](https://aur.archlinux.org/packages/volt-gui). Não mantenho, mas o empacotador tem sido gente boa, então não vou desencorajar.
 
-Read the `PKGBUILD` first. Not because of the packager, but because the AUR lets anyone submit anything.
+Leia o `PKGBUILD` primeiro. Não por causa do empacotador, mas porque o AUR permite que qualquer um envie qualquer coisa.
 
-### From source
+### Do código-fonte
 
-Every build target is a file, so make only rebuilds what changed. Everything lands under `build/`.
+Todo alvo de compilação é um arquivo, então o make só recompila o que mudou. Tudo cai em `build/`.
 
-| Command | What it does |
+| Comando | O que faz |
 |---------|--------------|
-| `make` | both layers, launcher, GUI, desktop entry |
-| `make layer-64` | 64-bit layer, launcher, probe |
-| `make layer-32` | 32-bit layer |
+| `make` | ambas camadas, lançador, GUI, entrada desktop |
+| `make layer-64` | camada 64-bit, lançador, sondagem |
+| `make layer-32` | camada 32-bit |
 | `make gui` | `build/bin/volt-gui` |
 | `make flatpak` | `build/bundles/*.flatpak` |
-| `make dist` | sources with `build/` populated |
-| `make release` | archive in `releases/`, host toolchain |
-| `make release-container` | same, inside the build image |
-| `sudo make install` | system-wide |
-| `make install-user` | into `~/.local`, no root |
-| `sudo make flatpak-install` | extension bundles |
-| `make flatpak-install-user` | same, `--user` |
+| `make dist` | fontes com `build/` preenchido |
+| `make release` | arquivo em `releases/`, toolchain do host |
+| `make release-container` | mesmo, dentro da imagem de compilação |
+| `sudo make install` | em todo o sistema |
+| `make install-user` | em `~/.local`, sem root |
+| `sudo make flatpak-install` | bundles de extensão |
+| `make flatpak-install-user` | mesmo, `--user` |
 | `make setup-user` | `install-user` + `flatpak-install-user` |
-| `sudo make uninstall` | everything |
-| `make uninstall-user` | the rootless install |
+| `sudo make uninstall` | tudo |
+| `make uninstall-user` | instalação sem root |
 | `make clean` | `rm -rf build releases` |
-| `make help` | this list |
+| `make help` | esta lista |
 
-A bare `make` builds both architectures. The 32-bit layer isn't optional, any Steam library has 32-bit titles. `make layer-32` exists for working on that one piece and adds the Rust target if missing.
+Um `make` puro compila ambas arquiteturas. A camada 32-bit não é opcional, qualquer biblioteca Steam tem títulos 32-bit. `make layer-32` existe para trabalhar naquela peça e adiciona o alvo Rust se faltar.
 
-Flatpak bundles are the opposite: optional, built only by `make flatpak`, and neither install target touches them.
+Bundles Flatpak são o oposto: opcionais, só com `make flatpak`, e nenhum alvo de instalação os toca.
 
-Actions artifacts are `make dist` trees. Unpack one and `sudo make install` installs without compiling.
+Artefatos de Actions são árvores `make dist`. Descompacte e `sudo make install` instala sem compilar.
 
-Building with `sudo` is refused, so you never end up with a root-owned `build/`. Install targets only copy what's already built and name what's missing if you skipped a step. volt-gui also refuses to start under `sudo`.
+Compilar com `sudo` é recusado, então você nunca fica com `build/` de root. Alvos de instalação só copiam o já compilado e nomeiam o que falta se você pulou etapa. O volt-gui também se recusa a iniciar sob `sudo`.
 
-Packagers can stage without root:
+Empacotadores podem preparar sem root:
 
 ```
 make
 make install DESTDIR="$PWD/pkg" PREFIX=/usr
 ```
 
-With `DESTDIR` set the install skips `ldconfig`, the desktop database, the icon cache, and the competing-install check.
+Com `DESTDIR` definido a instalação pula `ldconfig`, banco de dados desktop, cache de ícones e verificação de instalação concorrente.
 
-## Install paths
+## Caminhos de instalação
 
-| File | System | User |
+| Arquivo | Sistema | Usuário |
 |------|--------|------|
-| Launcher | `/usr/bin/volt` | `~/.local/bin/volt` |
-| Probe | `/usr/bin/volt-probe` | `~/.local/bin/volt-probe` |
+| Lançador | `/usr/bin/volt` | `~/.local/bin/volt` |
+| Sondagem | `/usr/bin/volt-probe` | `~/.local/bin/volt-probe` |
 | GUI | `/usr/bin/volt-gui` | `~/.local/bin/volt-gui` |
-| Library 64 | `/usr/lib/x86_64-linux-gnu/libvolt.so` | `~/.local/lib/volt/x86_64-linux-gnu/libvolt.so` |
-| Library 32 | `/usr/lib/i386-linux-gnu/libvolt.so` | `~/.local/lib/volt/i386-linux-gnu/libvolt.so` |
-| Manifest | `/usr/share/vulkan/implicit_layer.d/VkLayer_volt.json` | `~/.local/share/vulkan/implicit_layer.d/VkLayer_volt.json` |
-| Desktop entry | `/usr/share/applications/volt-gui.desktop` | `~/.local/share/applications/volt-gui.desktop` |
-| Icon | `/usr/share/icons/hicolor/256x256/apps/volt-gui.png` | `~/.local/share/icons/hicolor/256x256/apps/volt-gui.png` |
-| Install stamps | `/var/lib/volt` | `~/.local/share/volt` |
+| Biblioteca 64 | `/usr/lib/x86_64-linux-gnu/libvolt.so` | `~/.local/lib/volt/x86_64-linux-gnu/libvolt.so` |
+| Biblioteca 32 | `/usr/lib/i386-linux-gnu/libvolt.so` | `~/.local/lib/volt/i386-linux-gnu/libvolt.so` |
+| Manifesto | `/usr/share/vulkan/implicit_layer.d/VkLayer_volt.json` | `~/.local/share/vulkan/implicit_layer.d/VkLayer_volt.json` |
+| Entrada desktop | `/usr/share/applications/volt-gui.desktop` | `~/.local/share/applications/volt-gui.desktop` |
+| Ícone | `/usr/share/icons/hicolor/256x256/apps/volt-gui.png` | `~/.local/share/icons/hicolor/256x256/apps/volt-gui.png` |
+| Carimbos | `/var/lib/volt` | `~/.local/share/volt` |
 
-The library directory follows what your distribution uses. Because the manifest lands in the implicit layer directory and the libraries in standard paths, 32-bit games find the 32-bit layer and 64-bit games the 64-bit one with no `VK_LAYER_PATH` mapping.
+O diretório da biblioteca segue o que sua distribuição usa. Como o manifesto cai no diretório de camada implícita e as bibliotecas em caminhos padrão, jogos 32-bit encontram a camada 32-bit e jogos 64-bit a 64-bit sem mapeamento `VK_LAYER_PATH`.
 
 > [!WARNING]
-> Don't change `PREFIX` away from `/usr` or `/usr/local`. The loader only scans a fixed set of manifest directories. Installing to `/opt/volt` puts the manifest where nothing reads it and the launcher off `$PATH`.
+> Não mude `PREFIX` para fora de `/usr` ou `/usr/local`. O loader só varre um conjunto fixo de diretórios de manifesto. Instalar em `/opt/volt` coloca o manifesto onde nada lê e o lançador fora do `$PATH`.
 
-## Uninstalling
+## Desinstalando
 
 ```
-sudo make uninstall     # system
+sudo make uninstall     # sistema
 make uninstall-user     # ~/.local
 ```
 
-Both remove the binaries, libraries, manifest, desktop entry, icon, install stamps, the user-scope Flatpak extension and `~/.config/volt-gui`. Run directly as root there's no `SUDO_USER` to work from, so the user-scope steps are skipped.
+Ambos removem binários, bibliotecas, manifesto, entrada desktop, ícone, carimbos, extensão Flatpak do escopo usuário e `~/.config/volt-gui`. Rodando direto como root não há `SUDO_USER`, então passos de escopo usuário são pulados.
 
-Neither touches a 1.x install. 1.x lived in `/usr/local/bin`, 2.0 lives in `/usr/bin`. Remove 1.x first:
+Nenhum toca instalação 1.x. 1.x vivia em `/usr/local/bin`, 2.0 vive em `/usr/bin`. Remova 1.x primeiro:
 
 ```
 sudo rm -f /usr/local/bin/volt /usr/local/bin/volt-gui /usr/local/bin/volt-helper
@@ -267,41 +267,41 @@ sudo rm -f /usr/share/applications/volt-gui.desktop
 sudo update-desktop-database /usr/share/applications
 ```
 
-Do it before installing 2.0. `/usr/local/bin` comes first on most distributions, so a leftover 1.x `volt` shadows the new launcher, never sets `VOLT_ENABLE`, and every setting silently does nothing. If 2.0 looks dead, run `which volt`.
+Faça antes de instalar 2.0. `/usr/local/bin` vem primeiro na maioria das distribuições, então um `volt` 1.x restante sobrepõe o novo lançador, nunca define `VOLT_ENABLE`, e toda configuração silenciosamente não faz nada. Se 2.0 parece morto, rode `which volt`.
 
-`make clean` removes `build/` and `releases/` plus stray directories from older layouts.
+`make clean` remove `build/` e `releases/` mais diretórios perdidos de layouts antigos.
 
-## Immutable Systems
+## Sistemas Imutáveis
 
-On SteamOS, Bazzite, Silverblue and anything with a read-only `/usr`, skip the system install:
+No SteamOS, Bazzite, Silverblue e qualquer coisa com `/usr` somente leitura, pule a instalação no sistema:
 
 ```
 make
 make install-user
 ```
 
-Plus the Flatpak extension if you want it:
+Mais a extensão Flatpak se quiser:
 
 ```
 make flatpak
 make flatpak-install-user
 ```
 
-`~/.local/bin` has to be on your `PATH`, because volt-gui runs `volt` and `volt-probe` to read your hardware.
+`~/.local/bin` tem que estar no seu `PATH`, porque o volt-gui executa `volt` e `volt-probe` para ler seu hardware.
 
-Pick one install, not both. The loader scans system and user directories alike, so two manifests naming the same layer leave it undefined which is used, or whether the layer is inserted twice. Both install targets refuse to run while the other owns the layer.
+Escolha uma instalação, não ambas. O loader varre diretórios de sistema e usuário, então dois manifestos nomeando a mesma camada deixam indefinido qual é usado, ou se a camada é inserida duas vezes. Ambos alvos recusam rodar enquanto o outro possui a camada.
 
-The GUI is one self-contained binary, so unpacking a release and double-clicking `build/bin/volt-gui` opens the editor with nothing installed. Enough to write and copy profiles, not enough to use them: with no layer on disk the probe can't run, so every device-backed card holds only `default`.
+A GUI é um único binário autocontido, então descompactar um release e clicar duas vezes em `build/bin/volt-gui` abre o editor sem nada instalado. Suficiente para escrever e copiar perfis, não suficiente para usá-los: sem camada no disco a sondagem não roda, então todo card com dispositivo contém só `padrão`.
 
-The Flatpak extension never covers native Steam games, which run under the Steam Linux Runtime. The native install does reach them: Steam expands `%command%` on the host, and the runtime container bind-mounts your home directory and imports host implicit layers.
+A extensão Flatpak nunca cobre jogos Steam nativos, que rodam sob o Steam Linux Runtime. A instalação nativa os alcança: a Steam expande `%command%` no host, e o contêiner runtime monta seu diretório home e importa camadas implícitas do host.
 
 ## FEX-Emu / Box64
 
-On aarch64, x86_64 games run through FEX-Emu or Box64. There's no native aarch64 build because every shipping Vulkan game on Linux has an x86_64 build.
+Em aarch64, jogos x86_64 rodam via FEX-Emu ou Box64. Não há compilação nativa aarch64 porque todo jogo Vulkan em Linux tem compilação x86_64.
 
-Translation layers run the game inside their own root: a tree of x86_64 binaries separate from the host `/usr`. The layer goes into that tree.
+Camadas de tradução rodam o jogo dentro de sua própria raiz: uma árvore de binários x86_64 separada do host `/usr`. A camada vai para essa árvore.
 
-**If your kernel routes x86_64 ELFs through `binfmt_misc`,** an x86_64 Flatpak runtime behaves normally:
+**Se seu kernel roteia ELFs x86_64 via `binfmt_misc`,** um runtime Flatpak x86_64 se comporta normalmente:
 
 ```
 flatpak install org.freedesktop.Platform//24.08 --arch=x86_64
@@ -309,183 +309,179 @@ make flatpak
 make flatpak-install-user
 ```
 
-**Otherwise, install into the translation root:**
+**Caso contrário, instale na raiz de tradução:**
 
 ```
 make
-make install DESTDIR=/path/to/translation-root
+make install DESTDIR=/caminho/para/raiz-de-tradução
 ```
 
-Needs no root and touches nothing on the host. Clear it with `make DESTDIR=/path/to/translation-root uninstall`.
+Não precisa de root e não toca nada no host. Limpe com `make DESTDIR=/caminho/para/raiz-de-tradução uninstall`.
 
-## Building Releases
+## Compilando Releases
 
-Both targets produce `releases/volt-gui-<version>.tar.gz`, a ready-to-install tree. Unpack and `sudo make install` without compiling.
+Ambos alvos produzem `releases/volt-gui-<versão>.tar.gz`, uma árvore pronta para instalar. Descompacte e `sudo make install` sem compilar.
 
-`make release` uses your toolchain and inherits your glibc floor.
+`make release` usa sua toolchain e herda seu piso glibc.
 
-`make release-container` builds inside `rust:1.85.1-bookworm` (glibc 2.36, Python 3.11), so the floor is fixed. Builds into `build/container/` and runs as your uid.
+`make release-container` compila dentro de `rust:1.85.1-bookworm` (glibc 2.36, Python 3.11), então o piso é fixo. Compila em `build/container/` e roda como seu uid.
 
 ```
 make release-container CONTAINER_BASE=rust:1.85.1-bullseye
 make release-container CONTAINER=docker
 ```
 
-Bullseye drops the floor to glibc 2.31 but ships Python 3.9, below what the GUI needs. Use it for `make layer-64 layer-32` only.
+Bullseye baixa o piso para glibc 2.31 mas traz Python 3.9, abaixo do que a GUI precisa. Use para `make layer-64 layer-32` apenas.
 
-## Usage
+## Uso
 
 ```
-volt [--probe] [PROFILE] -- COMMAND [ARGS...]
-volt -- COMMAND [ARGS...]      # default profile
+volt [--probe] [PERFIL] -- COMANDO [ARGS...]
+volt -- COMANDO [ARGS...]      # perfil padrão
 volt --help
 ```
 
-Everything before `--` is launcher options, everything after is the command:
+Tudo antes de `--` são opções do lançador, tudo depois é o comando:
 
 ```
 volt -- %command%                # Steam
-volt myprofile -- %command%      # named profile
-volt -- ./game
-volt -- flatpak run com.example.Game
+volt meuperfil -- %command%      # perfil nomeado
+volt -- ./jogo
+volt -- flatpak run com.example.Jogo
 ```
 
-The launch command for the selected profile is shown next to the Apply button, ready to copy.
+O comando de inicialização para o perfil selecionado é mostrado ao lado do botão Aplicar, pronto para copiar.
 
-Profile names must be non-empty printable ASCII with no path separator and no `..`. Anything else falls back to default with a warning. The launcher writes a commented profile on first use.
+Nomes de perfil devem ser ASCII imprimível não vazio sem separador de caminho e sem `..`. Qualquer outro cai no padrão com um aviso. O lançador escreve um perfil comentado no primeiro uso.
 
-To see what applied:
-
-```
-VOLT_LOG=info volt -- ./game
-```
-
-Every line is prefixed `[volt]` and goes to stderr.
-
-At `info` every setting gets a line, naming what the game asked for and what
-volt wrote in its place.
+Para ver o que foi aplicado:
 
 ```
-[volt] gpu device: asked 2
-[volt] present_mode: asked fifo, forced mailbox
-[volt] image_count: asked 3
-[volt] mag_filter: asked linear, forced nearest
-[volt] anisotropy: asked off, forced 16
-[volt] depth_clamp: asked off; the application did not enable depthClamp
-[volt] frame_limit: forced 60
-[volt] frame_pacing: the profile did not set it
+VOLT_LOG=info volt -- ./jogo
 ```
 
-No forced value means volt left that setting alone, either because it is
-`default` or because the game already asked for what you picked. The forced
-value is the one volt wrote, so a setting the device clamped shows what
-landed rather than what the profile says.
+Cada linha é prefixada `[volt]` e vai para stderr.
 
-The five Framerate settings have no asked value, since a game never tells
-Vulkan what frame rate it wants. They report what volt forced, or say the
-profile did not set them.
+Em `info` cada configuração ganha uma linha, nomeando o que o jogo pediu e o que o volt escreveu no lugar.
 
-The GPU line reports the device id as `forced N` when the profile sets a gpu, and `asked N` when it does not.
+```
+[volt] gpu device: pedido 2
+[volt] present_mode: pedido fifo, forçado mailbox
+[volt] image_count: pedido 3
+[volt] mag_filter: pedido linear, forçado nearest
+[volt] anisotropy: pedido desligado, forçado 16
+[volt] depth_clamp: pedido desligado; o aplicativo não habilitou depthClamp
+[volt] frame_limit: forçado 60
+[volt] frame_pacing: o perfil não definiu
+```
 
-Each setting prints once per device, so 21 lines at most however many
-samplers, pipelines or swapchains the game creates.
+Nenhum valor forçado significa que o volt deixou aquela configuração em paz, seja porque é `padrão` ou porque o jogo já pediu o que você escolheu. O valor forçado é o que o volt escreveu, então uma configuração que o dispositivo limitou mostra o que caiu em vez do que o perfil diz.
 
-## Environment Variables
+As cinco configurações de Taxa de Quadros não têm valor pedido, já que um jogo nunca diz ao Vulkan qual taxa quer. Elas reportam o que o volt forçou, ou dizem que o perfil não as definiu.
 
-| Variable | Purpose | Values | Default |
+A linha da GPU reporta o id do dispositivo como `forçado N` quando o perfil define gpu, e `pedido N` quando não.
+
+Cada configuração imprime uma vez por dispositivo, então no máximo 21 linhas por mais samplers, pipelines ou swapchains que o jogo criar.
+
+## Variáveis de Ambiente
+
+| Variável | Propósito | Valores | Padrão |
 |----------|---------|--------|---------|
-| `VOLT_CONFIG_NAME` | which profile to load | any profile name | `default` |
-| `VOLT_LOG` | log verbosity, to stderr | `off`, `error`, `warn`, `info` | `warn` |
-| `VOLT_PROBE` | write `probe.toml` on first swapchain | any non-empty value | unset |
-| `VOLT_ENABLE` | activates the layer | `1` | unset |
-| `VOLT_DISABLE` | the loader's off switch | `1` | unset |
+| `VOLT_CONFIG_NAME` | qual perfil carregar | qualquer nome de perfil | `default` |
+| `VOLT_LOG` | verbosidade do log, para stderr | `off`, `error`, `warn`, `info` | `warn` |
+| `VOLT_PROBE` | grava `probe.toml` na primeira swapchain | qualquer valor não vazio | não definido |
+| `VOLT_ENABLE` | ativa a camada | `1` | não definido |
+| `VOLT_DISABLE` | off switch do loader | `1` | não definido |
 
-`HOME` decides where profiles live and falls back to `/tmp` with a warning. `LD_LIBRARY_PATH` is extended by the launcher with both layer directories, preserving what was there.
+`HOME` decide onde perfis vivem e cai em `/tmp` com aviso. `LD_LIBRARY_PATH` é estendido pelo lançador com ambos diretórios de camada, preservando o que havia.
 
-There's no environment override for the settings themselves. A profile file is the only way to set them, which keeps the panel and the layer describing the same thing.
+Não há override de ambiente para as configurações em si. Um arquivo de perfil é a única forma de defini-las, o que mantém painel e camada descrevendo a mesma coisa.
 
-## Files
+## Arquivos
 
-| Path | What it is |
+| Caminho | O que é |
 |------|------------|
-| `~/.config/volt-gui/default.toml` | default profile |
-| `~/.config/volt-gui/<name>.toml` | named profiles |
-| `~/.config/volt-gui/probe.toml` | what the last probe read |
-| `~/.config/volt-gui/options.toml` | volt-gui preferences and last active profile |
+| `~/.config/volt-gui/default.toml` | perfil padrão |
+| `~/.config/volt-gui/<nome>.toml` | perfis nomeados |
+| `~/.config/volt-gui/probe.toml` | o que a última sondagem leu |
+| `~/.config/volt-gui/options.toml` | preferências do volt-gui e último perfil ativo |
 
-Profiles are plain TOML, one section per tab and one string per setting, so you can edit them by hand or keep them in a dotfiles repo. `probe.toml` is written by the layer and watched by the GUI, so a freshly probed device fills the panel without a restart. Deleting it costs a re-probe.
+Perfis são TOML simples, uma seção por aba e uma string por configuração, então você pode editá-los à mão ou manter em repo dotfiles. `probe.toml` é escrito pela camada e vigiado pela GUI, então um dispositivo sondado preenche o painel sem reiniciar. Deletá-lo custa uma nova sondagem.
 
 ## Flatpak
 
-Flatpak games can't see host paths, so the layer ships as a runtime extension for `org.freedesktop.Platform` 23.08, 24.08 and 25.08.
+Jogos Flatpak não enxergam caminhos do host, então a camada vem como extensão de runtime para `org.freedesktop.Platform` 23.08, 24.08 e 25.08.
 
-Separate and optional. Neither `make` nor the install targets produce or touch the bundles:
+Separada e opcional. Nem `make` nem alvos de instalação produzem ou tocam os bundles:
 
 ```
 make flatpak
-make flatpak-install-user     # or: sudo make flatpak-install
+make flatpak-install-user     # ou: sudo make flatpak-install
 ```
 
-One bundle per runtime. Install the one matching yours, run `flatpak list` if unsure. Multiple versions can coexist. Every bundle carries the 32-bit library too.
+Um bundle por runtime. Instale o que combina com o seu, rode `flatpak list` se não souber. Múltiplas versões podem coexistir. Todo bundle carrega a biblioteca 32-bit também.
 
 ```
 flatpak install --user build/bundles/org.freedesktop.Platform.VulkanLayer.volt-24.08.flatpak
 flatpak uninstall --user org.freedesktop.Platform.VulkanLayer.volt
 ```
 
-The launcher detects `flatpak run` and routes through the in-sandbox wrapper:
+O lançador detecta `flatpak run` e roteia pelo wrapper dentro do sandbox:
 
 ```
-volt -- flatpak run com.example.Game
-volt -- flatpak run --branch=stable com.example.Game
-volt myprofile -- flatpak run com.example.Game
+volt -- flatpak run com.example.Jogo
+volt -- flatpak run --branch=stable com.example.Jogo
+volt meuperfil -- flatpak run com.example.Jogo
 ```
 
-There's no Flatpak build of volt-gui itself, only the layer.
+Não há build Flatpak do próprio volt-gui, só da camada.
 
-### Without the launcher
+### Sem o lançador
 
-Call the wrapper yourself, useful where only the extension is installed:
+Chame o wrapper você mesmo, útil onde só a extensão está instalada:
 
 ```
-flatpak run --command=/usr/lib/extensions/vulkan/volt/bin/volt-flatpak com.example.Game
-VOLT_CONFIG_NAME=myprofile flatpak run --command=/usr/lib/extensions/vulkan/volt/bin/volt-flatpak com.example.Game
+flatpak run --command=/usr/lib/extensions/vulkan/volt/bin/volt-flatpak com.example.Jogo
+VOLT_CONFIG_NAME=meuperfil flatpak run --command=/usr/lib/extensions/vulkan/volt/bin/volt-flatpak com.example.Jogo
 ```
 
-Same line works as a Steam launch option for a Flatpak game:
+A mesma linha funciona como opção de inicialização Steam para um jogo Flatpak:
 
 ```
 /usr/lib/extensions/vulkan/volt/bin/volt-flatpak %command%
 ```
 
-Your home directory is mounted into the sandbox, so profiles apply unchanged.
+Seu diretório home é montado no sandbox, então perfis se aplicam sem mudanças.
 
-## Profiles, Presets & Options
+## Perfis, Predefinições e Opções
 
-**Profiles** are TOML files in `~/.config/volt-gui/`, one per configuration. Create and switch from the GUI, the tray, or `volt <name> -- ...`. Switching saves the one you were on and restarts the probe.
+**Perfis** são arquivos TOML em `~/.config/volt-gui/`, um por configuração. Crie e troque pela GUI, bandeja ou `volt <nome> -- ...`. Trocar salva aquele em que estava e reinicia a sondagem.
 
-**Presets** fill the active profile with curated values, from Quality (trilinear, 16x anisotropy, blended mips, classic vsync) down to Potato Low Latency (bilinear, anisotropy off, hard mip cuts, immediate present, 2 images). A preset writes every value, so anything it doesn't set goes back to default. Frame limit, composite alpha and clipped presentation are left alone since those depend on your display. A preset naming something your hardware lacks resets that one to default and says which.
+**Predefinições** preenchem o perfil ativo com valores curados, de Qualidade (trilinear, anisotropia 16x, mips misturados, vsync clássico) até Batata Baixa Latência (bilinear, anisotropia desligada, cortes duros de mip, present imediato, 2 imagens). Uma predefinição grava todo valor, então qualquer coisa que não define volta ao padrão. Limite de quadros, alfa composto e apresentação recortada são deixados em paz já que dependem da sua tela. Uma predefinição nomeando algo que seu hardware não tem reseta aquele para padrão e diz quais.
 
-**Options** holds volt-gui's own preferences, not anything the layer reads: theme, transparency, scale, start maximised or in tray, tray icon, welcome window. They save as you change them and take effect on restart. One instance at a time.
+**Opções** guarda preferências do próprio volt-gui, não nada que a camada lê: tema, transparência, escala, iniciar maximizado ou na bandeja, ícone da bandeja, janela de boas-vindas. Salvam conforme você muda e têm efeito ao reiniciar. Uma instância por vez.
 
-## What volt will never do
+## O que o volt nunca fará
 
-volt changes what the game asks Vulkan for. It never draws. Anything needing shader injection or image processing is out of scope.
+O volt muda o que o jogo pede ao Vulkan. Ele nunca desenha. Qualquer coisa precisando injeção de shader ou processamento de imagem está fora de escopo.
 
-- **Sharpening, FSR, upscaling, frame generation, post processing.**
-- **Forced MSAA or SSAA.** Adding samples means recreating every render target, adding resolves and rewriting pipelines and shaders. That's the game's frame graph, not a value passing by.
-- **Colour depth, colour space, transfer function.** Every 10-bit surface format is UNORM, so forcing 8 to 10 drops hardware sRGB encoding and washes the picture out, and a game that hardcoded its format ends up with image views that don't match. None of it makes a game render wider content anyway. A game that wants HDR asks for it through DXVK_HDR, PROTON_ENABLE_HDR or gamescope.
-- **Cubic filtering.** Needs `VK_EXT_filter_cubic`, admitted per format, while a sampler names no format at all. There's no moment where volt can tell whether it'd be legal.
-- **Overlays and HUDs.** Use MangoHud.
-- **Overclocking, fan curves, power limits.** That's sysfs, not Vulkan. Use LACT, or CoreCtrl if you want CPU controls too.
-- **OpenGL.** The per-driver environment variable maze is exactly what this rewrite retired.
-- **Enable a feature or extension the game didn't request.**
-- **Require a Vulkan extension.** Core 1.0 and `VK_KHR_swapchain` is the whole surface.
-- **Resolution scaling.** Needs `VK_KHR_surface_maintenance1` and `VK_KHR_swapchain_maintenance1`, and volt enables neither. Use gamescope.
-- **Frame pacing tighter than the limiter gives.** Deadlines measured against the display need `VK_KHR_present_wait` or `VK_EXT_present_timing`. `late` is as close as core Vulkan reaches.
-- **Change a setting under a running game.**
-- **Write into memory the game owns.** volt patches the structures it passes on and fills the arrays a query asks it to fill. A `pNext` chain the game built is read, never written.
+- **Nitidez, FSR, upscaling, geração de quadros, pós-processamento.**
+- **MSAA ou SSAA forçado.** Adicionar amostras significa recriar todo render target, adicionar resolves e reescrever pipelines e shaders. Isso é o grafo de quadros do jogo, não um valor passando.
+- **Profundidade de cor, espaço de cor, função de transferência.** Todo formato de superfície 10-bit é UNORM, então forçar 8 para 10 perde codificação sRGB de hardware e lava a imagem, e um jogo que codificou seu formato termina com image views que não batem. Nada disso faz um jogo renderizar conteúdo mais amplo. Um jogo que quer HDR pede via DXVK_HDR, PROTON_ENABLE_HDR ou gamescope.
+- **Filtragem cúbica.** Precisa `VK_EXT_filter_cubic`, admitido por formato, enquanto um amostrador não nomeia formato. Não há momento onde o volt pode dizer se seria legal.
+- **Sobreposições e HUDs.** Use MangoHud.
+- **Overclock, curvas de ventoinha, limites de energia.** Isso é sysfs, não Vulkan. Use LACT, ou CoreCtrl se quiser controles de CPU também.
+- **OpenGL.** O labirinto de variável de ambiente por driver é exatamente o que esta reescrita aposentou.
+- **Habilitar um recurso ou extensão que o jogo não requisitou.**
+- **Requerer uma extensão Vulkan.** Core 1.0 e `VK_KHR_swapchain` é toda a superfície.
+- **Escala de resolução.** Precisa `VK_KHR_surface_maintenance1` e `VK_KHR_swapchain_maintenance1`, e o volt não habilita nenhum. Use gamescope.
+- **Ritmo de quadros mais apertado que o limitador dá.** Prazos medidos contra a tela precisam `VK_KHR_present_wait` ou `VK_EXT_present_timing`. `late` é o mais perto que Vulkan base alcança.
+- **Mudar uma configuração com um jogo rodando.**
+- **Escrever em memória que o jogo possui.** O volt corrige as estruturas que repassa e preenche os arrays que uma consulta pede para preencher. Uma cadeia `pNext` que o jogo construiu é lida, nunca escrita.
 
-## Contributing
+## Contribuindo
 
-Contributions welcome. The layer is plain Rust with no build scripts, the GUI is PySide6 only. Keep changes working on core Vulkan 1.0 with no extensions that floor is the point of the project.
+Contribuições bem-vindas. A camada é Rust puro sem scripts de compilação, a GUI é só PySide6. Mantenha mudanças funcionando em Vulkan 1.0 base sem extensões — esse piso é o ponto do projeto.
+
+---
+*Tradução pt-BR por [LucianoSkx](https://github.com/LucianoSkx) — fork de [pythonlover02/volt-gui](https://github.com/pythonlover02/volt-gui).*
