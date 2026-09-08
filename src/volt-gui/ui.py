@@ -31,6 +31,7 @@ from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget
 
 from database import APP_VERSION
+from database import TAB_LABELS
 from database import call_cards_for_tab
 from themes import BASE_COLORS
 from themes import SLIDER_HANDLE_WIDTH
@@ -243,7 +244,7 @@ def build_monospace_font() -> QFont:
 
 def process_copy_button_action(copy_button: QPushButton, clipboard_text: str) -> None:
     QApplication.clipboard().setText(clipboard_text)
-    copy_button.setText("Copied!")
+    copy_button.setText("Copiado!")
     effect = QGraphicsOpacityEffect(copy_button)
     copy_button.setGraphicsEffect(effect)
     animation = QPropertyAnimation(effect, b"opacity")
@@ -252,7 +253,7 @@ def process_copy_button_action(copy_button: QPushButton, clipboard_text: str) ->
     animation.setEndValue(1.0)
     animation.setEasingCurve(QEasingCurve.OutCubic)
     animation.start()
-    QTimer.singleShot(COPY_RESET_MS, lambda: copy_button.setText("Copy"))
+    QTimer.singleShot(COPY_RESET_MS, lambda: copy_button.setText("Copiar"))
     return None
 
 
@@ -279,7 +280,7 @@ def create_code_block_widget(code_text: str) -> QFrame:
     text_edit.setFont(build_monospace_font())
     text_edit.setFixedHeight(STANDARD_BUTTON_HEIGHT)
     text_edit.setStyleSheet(STYLE_CODE_EDIT)
-    copy_button = QPushButton("Copy")
+    copy_button = QPushButton("Copiar")
     copy_button.setCursor(QCursor(Qt.PointingHandCursor))
     copy_button.setFixedSize(COPY_BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT)
     copy_button.setStyleSheet(build_copy_button_stylesheet(COPY_BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT))
@@ -415,7 +416,7 @@ def create_sidebar_tab_list(tab_names: tuple, stacked_widget: QStackedWidget) ->
     tab_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
     tab_list.setFocusPolicy(Qt.NoFocus)
     for tab_name in tab_names:
-        item = QListWidgetItem(tab_name)
+        item = QListWidgetItem(TAB_LABELS.get(tab_name, tab_name))
         item.setSizeHint(item.sizeHint().__class__(item.sizeHint().width(), 36))
         tab_list.addItem(item)
     tab_list.setCurrentRow(0)
