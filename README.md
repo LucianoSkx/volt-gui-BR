@@ -172,15 +172,31 @@ O volt-gui é o front-end PySide6. Aplicar apenas salva o perfil. Sem permissõe
 
 ## Requisitos
 
+### Para compilar
+
+| Componente | Requisito | Como instalar (Arch/CachyOS) |
+|-----------|-------------|----------------------------|
+| Rust | 1.85.1+ com **rustup** | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh -s -- -y --default-toolchain stable --profile minimal` |
+| Target i686 | `i686-unknown-linux-gnu` | `rustup target add i686-unknown-linux-gnu` |
+| GNU Make | 4.3+ | `sudo pacman -S make` |
+| GCC (32-bit) | `gcc-multilib` | `sudo pacman -S gcc-multilib` |
+| Python | 3.10+ | `sudo pacman -S python` |
+| PySide6 | ≥ 6.5 | Instalado automaticamente pelo `make` via `requirements.txt` |
+| pkg-config | — | `sudo pacman -S pkg-config` |
+
+### Para runtime
+
 | Componente | Requisito |
 |-----------|-------------|
 | Camada | Vulkan 1.0+ com `VK_KHR_swapchain`, Linux x86_64 (mais i686 para jogos 32-bit) |
-| Compilação | Rust 1.85.1+ com rustup, GNU make 4.3+ |
-| Camada 32-bit | `gcc-multilib`, `libc6-dev-i386` |
-| GUI | Python 3.10+, PySide6 |
+| Sondagem | `libxcb` ou `libwayland-client` em runtime, nenhum obrigatório |
+
+### Opcionais
+
+| Componente | Requisito |
+|-----------|-------------|
 | Bundles Flatpak | `flatpak`, `ostree` |
 | Release em contêiner | `podman` ou `docker` |
-| Sondagem | `libxcb` ou `libwayland-client` em runtime, nenhum obrigatório |
 
 Sem compilação nativa aarch64. Veja [FEX-Emu / Box64](#fex-emu--box64).
 
