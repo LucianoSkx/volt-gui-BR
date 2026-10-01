@@ -14,8 +14,8 @@ Vulkan 1.0 e superior. A camada não pede nada além de `VK_KHR_swapchain`, ent�
 ## Início Rápido
 
 ```
-git clone https://github.com/pythonlover02/volt-gui.git
-cd volt-gui
+git clone https://github.com/LucianoSkx/volt-gui-BR.git
+cd volt-gui-BR
 make
 make install-user
 
