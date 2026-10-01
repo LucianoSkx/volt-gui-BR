@@ -172,17 +172,27 @@ O volt-gui é o front-end PySide6. Aplicar apenas salva o perfil. Sem permissõe
 
 ## Requisitos
 
-### Para compilar
+### Para compilar (Arch / CachyOS)
 
-| Componente | Requisito | Como instalar (Arch/CachyOS) |
-|-----------|-------------|----------------------------|
-| Rust | 1.85.1+ com **rustup** | `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh -s -- -y --default-toolchain stable --profile minimal` |
+```bash
+# Rust via rustup (necessário para o target i686)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
+source "$HOME/.cargo/env"
+rustup target add i686-unknown-linux-gnu
+
+# Dependências do sistema
+sudo pacman -S base-devel gcc-multilib make pkg-config python
+```
+
+| Componente | Requisito | Pacote / Comando |
+|-----------|-------------|------------------|
+| Rust | 1.85.1+ com **rustup** | `rustup` (via instalador oficial) |
 | Target i686 | `i686-unknown-linux-gnu` | `rustup target add i686-unknown-linux-gnu` |
-| GNU Make | 4.3+ | `sudo pacman -S make` |
-| GCC (32-bit) | `gcc-multilib` | `sudo pacman -S gcc-multilib` |
-| Python | 3.10+ | `sudo pacman -S python` |
-| PySide6 | ≥ 6.5 | Instalado automaticamente pelo `make` via `requirements.txt` |
-| pkg-config | — | `sudo pacman -S pkg-config` |
+| GNU Make | 4.3+ | `make` |
+| GCC (32-bit) | suporte a i686 | `gcc-multilib` |
+| Python | 3.10+ | `python` |
+| PySide6 | ≥ 6.5 | instalado pelo `make` via `requirements.txt` |
+| pkg-config | — | `pkg-config` |
 
 ### Para runtime
 
@@ -193,10 +203,10 @@ O volt-gui é o front-end PySide6. Aplicar apenas salva o perfil. Sem permissõe
 
 ### Opcionais
 
-| Componente | Requisito |
-|-----------|-------------|
-| Bundles Flatpak | `flatpak`, `ostree` |
-| Release em contêiner | `podman` ou `docker` |
+| Componente | Requisito | Pacote |
+|-----------|-------------|--------|
+| Bundles Flatpak | `flatpak`, `ostree` | `flatpak`, `ostree` |
+| Release em contêiner | `podman` ou `docker` | `podman` ou `docker` |
 
 Sem compilação nativa aarch64. Veja [FEX-Emu / Box64](#fex-emu--box64).
 
