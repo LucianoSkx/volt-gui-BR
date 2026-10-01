@@ -1,7 +1,5 @@
 > [!NOTE]
 > Este fork é mantido apenas para a tradução pt-BR. O projeto original é [pythonlover02/volt-gui](https://github.com/pythonlover02/volt-gui) — reportes de bugs e melhorias da camada devem ser feitos lá. Este fork é responsável somente pela tradução para o Português-BR.
->
-> Nota do autor original: inglês também não é minha primeira língua. Falo principalmente espanhol (e um pouco de português), então costumo escrever a documentação em espanhol, passar por um tradutor e depois editar o resultado. Algumas partes podem soar um pouco rígidas ou artificiais por isso. Se algo estiver confuso, abra uma issue que eu corrijo.
 
 # volt-gui
 
