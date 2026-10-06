@@ -7,6 +7,8 @@ Painel de controle para jogos Vulkan no Linux. As configurações são aplicadas
 
 Vulkan 1.0 e superior. A camada não pede nada além de `VK_KHR_swapchain`, então o comportamento nunca se divide entre drivers.
 
+volt-gui originally carried kernel settings too. To keep both projects easier to ship and maintain, and each with one objective, they were split: volt stays a Vulkan control panel, and the kernel side now lives in [ohm-gui](https://github.com/pythonlover02/ohm-gui).
+
 ![](/images/1.png)
 ![](/images/2.png)
 ![](/images/3.png)
@@ -189,7 +191,7 @@ sudo pacman -S base-devel gcc-multilib make pkg-config python
 | Rust | 1.85.1+ com **rustup** | `rustup` (via instalador oficial) |
 | Target i686 | `i686-unknown-linux-gnu` | `rustup target add i686-unknown-linux-gnu` |
 | GNU Make | 4.3+ | `make` |
-| GCC (32-bit) | suporte a i686 | `gcc-multilib` |
+| GCC (32-bit) | suporte a i686 (glibc e libgcc) | `gcc-multilib` |
 | Python | 3.10+ | `python` |
 | PySide6 | ≥ 6.5 | instalado pelo `make` via `requirements.txt` |
 | pkg-config | — | `pkg-config` |
